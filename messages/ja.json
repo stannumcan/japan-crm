@@ -1,0 +1,67 @@
+{
+  "common": {
+    "appName": "Japan CRM",
+    "loading": "読み込み中...",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "edit": "編集",
+    "delete": "削除",
+    "search": "検索",
+    "status": "ステータス",
+    "date": "日付",
+    "actions": "操作",
+    "back": "戻る",
+    "next": "次へ",
+    "submit": "送信",
+    "confirm": "確認",
+    "close": "閉じる",
+    "total": "合計"
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "quotes": "見積書",
+    "customers": "顧客",
+    "products": "製品",
+    "settings": "設定"
+  },
+  "quotes": {
+    "title": "見積書",
+    "new": "新規見積書",
+    "quoteNumber": "見積番号",
+    "customer": "顧客",
+    "date": "日付",
+    "validUntil": "有効期限",
+    "status": "ステータス",
+    "amount": "金額",
+    "currency": "通貨",
+    "notes": "備考",
+    "internalNotes": "社内メモ",
+    "items": "明細",
+    "addItem": "明細追加",
+    "product": "製品",
+    "description": "説明",
+    "quantity": "数量",
+    "unitPrice": "単価",
+    "discount": "割引率 (%)",
+    "subtotal": "小計",
+    "tax": "税金",
+    "grandTotal": "合計金額",
+    "statuses": {
+      "draft": "下書き",
+      "sent": "送付済",
+      "approved": "承認済",
+      "rejected": "却下",
+      "expired": "期限切れ"
+    },
+    "createSuccess": "見積書を作成しました",
+    "updateSuccess": "見積書を更新しました",
+    "deleteSuccess": "見積書を削除しました"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "totalQuotes": "見積総数",
+    "pendingQuotes": "保留中",
+    "approvedQuotes": "承認済",
+    "totalValue": "合計金額"
+  }
+}

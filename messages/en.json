@@ -1,0 +1,67 @@
+{
+  "common": {
+    "appName": "Japan CRM",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "status": "Status",
+    "date": "Date",
+    "actions": "Actions",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "close": "Close",
+    "total": "Total"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "quotes": "Quotes",
+    "customers": "Customers",
+    "products": "Products",
+    "settings": "Settings"
+  },
+  "quotes": {
+    "title": "Quotes",
+    "new": "New Quote",
+    "quoteNumber": "Quote #",
+    "customer": "Customer",
+    "date": "Date",
+    "validUntil": "Valid Until",
+    "status": "Status",
+    "amount": "Amount",
+    "currency": "Currency",
+    "notes": "Notes",
+    "internalNotes": "Internal Notes",
+    "items": "Line Items",
+    "addItem": "Add Item",
+    "product": "Product",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "discount": "Discount (%)",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "grandTotal": "Grand Total",
+    "statuses": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "createSuccess": "Quote created successfully",
+    "updateSuccess": "Quote updated successfully",
+    "deleteSuccess": "Quote deleted successfully"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalQuotes": "Total Quotes",
+    "pendingQuotes": "Pending",
+    "approvedQuotes": "Approved",
+    "totalValue": "Total Value"
+  }
+}

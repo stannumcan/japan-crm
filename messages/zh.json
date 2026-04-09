@@ -1,0 +1,67 @@
+{
+  "common": {
+    "appName": "Japan CRM",
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "edit": "编辑",
+    "delete": "删除",
+    "search": "搜索",
+    "status": "状态",
+    "date": "日期",
+    "actions": "操作",
+    "back": "返回",
+    "next": "下一步",
+    "submit": "提交",
+    "confirm": "确认",
+    "close": "关闭",
+    "total": "合计"
+  },
+  "nav": {
+    "dashboard": "仪表板",
+    "quotes": "报价单",
+    "customers": "客户",
+    "products": "产品",
+    "settings": "设置"
+  },
+  "quotes": {
+    "title": "报价单",
+    "new": "新建报价单",
+    "quoteNumber": "报价编号",
+    "customer": "客户",
+    "date": "日期",
+    "validUntil": "有效期至",
+    "status": "状态",
+    "amount": "金额",
+    "currency": "货币",
+    "notes": "备注",
+    "internalNotes": "内部备注",
+    "items": "明细项目",
+    "addItem": "添加项目",
+    "product": "产品",
+    "description": "描述",
+    "quantity": "数量",
+    "unitPrice": "单价",
+    "discount": "折扣 (%)",
+    "subtotal": "小计",
+    "tax": "税额",
+    "grandTotal": "总计",
+    "statuses": {
+      "draft": "草稿",
+      "sent": "已发送",
+      "approved": "已批准",
+      "rejected": "已拒绝",
+      "expired": "已过期"
+    },
+    "createSuccess": "报价单创建成功",
+    "updateSuccess": "报价单更新成功",
+    "deleteSuccess": "报价单删除成功"
+  },
+  "dashboard": {
+    "title": "仪表板",
+    "totalQuotes": "报价总数",
+    "pendingQuotes": "待处理",
+    "approvedQuotes": "已批准",
+    "totalValue": "总金额"
+  }
+}
