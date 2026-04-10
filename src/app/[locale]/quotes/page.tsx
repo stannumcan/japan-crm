@@ -40,7 +40,7 @@ export default async function QuotesPage({
           <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
           <p className="text-sm text-gray-500 mt-1">{quotations?.length ?? 0} {tc("total")}</p>
         </div>
-        <Link href={`/${locale}/workorders`}>
+        <Link href={`/${locale}/quotes/new`}>
           <Button className="gap-2">
             <FileText className="h-4 w-4" />
             {t("new")}
