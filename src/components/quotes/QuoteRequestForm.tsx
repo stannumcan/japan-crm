@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, AlertCircle } from "lucide-react";
+import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
+import { Modal } from "@/components/ui/modal";
 
 interface MoldEntry {
   id: string;
   type: "existing" | "new";
-  value: string; // mold number for existing, description for new
+  value: string;
 }
 
 interface QuantityTier {
@@ -25,31 +27,129 @@ interface QuantityTier {
   tier_notes: string;
 }
 
+interface WOOption {
+  id: string;
+  wo_number: string;
+  project_name: string;
+}
+
 const TIER_LABELS = ["A", "B", "C", "D", "E", "F"];
+
+// Quick-create company modal (same as WOForm)
+function QuickCompanyForm({
+  initialName,
+  onCreated,
+  onCancel,
+}: {
+  initialName: string;
+  onCreated: (company: { id: string; name: string; name_ja: string | null }) => void;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState(initialName);
+  const [nameJa, setNameJa] = useState("");
+  const [nameZh, setNameZh] = useState("");
+  const [country, setCountry] = useState("JP");
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
+
+  const handleSave = async () => {
+    if (!name.trim()) { setErr("Name is required"); return; }
+    setSaving(true);
+    setErr("");
+    try {
+      const res = await fetch("/api/companies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), name_ja: nameJa || null, name_zh: nameZh || null, country }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      onCreated(await res.json());
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Unknown error");
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-500">Fill in basic details — you can complete the full profile later.</p>
+      <div className="space-y-2">
+        <Label>Company Name <span className="text-red-500">*</span></Label>
+        <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <Label>Japanese Name</Label>
+          <Input value={nameJa} onChange={(e) => setNameJa(e.target.value)} placeholder="e.g. ユニバーサル・スタジオ" />
+        </div>
+        <div className="space-y-2">
+          <Label>Chinese Name</Label>
+          <Input value={nameZh} onChange={(e) => setNameZh(e.target.value)} />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label>Country</Label>
+        <Select value={country} onValueChange={(v) => v && setCountry(v)}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="JP">Japan (JP)</SelectItem>
+            <SelectItem value="CN">China (CN)</SelectItem>
+            <SelectItem value="CA">Canada (CA)</SelectItem>
+            <SelectItem value="OTHER">Other</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {err && <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">{err}</div>}
+      <div className="flex gap-3 justify-end pt-2">
+        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button type="button" onClick={handleSave} disabled={saving}>{saving ? "Creating..." : "Create Company"}</Button>
+      </div>
+    </div>
+  );
+}
 
 export default function QuoteRequestForm({
   locale,
-  woId,
-  woNumber,
+  prefilledWoId,
+  prefilledWoNumber,
+  prefilledCompanyId,
+  prefilledCompanyName,
 }: {
   locale: string;
-  woId: string;
-  woNumber: string;
+  prefilledWoId?: string;
+  prefilledWoNumber?: string;
+  prefilledCompanyId?: string;
+  prefilledCompanyName?: string;
 }) {
   const t = useTranslations("quotes");
+  const tw = useTranslations("workorders");
   const tc = useTranslations("common");
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Request info
+  // ── Company selector ─────────────────────────────────────────────
+  const [companyOptions, setCompanyOptions] = useState<ComboboxOption[]>([]);
+  const [companySearchLoading, setCompanySearchLoading] = useState(false);
+  const [selectedCompanyId, setSelectedCompanyId] = useState(prefilledCompanyId ?? "");
+  const [selectedCompanyName, setSelectedCompanyName] = useState(prefilledCompanyName ?? "");
+  const [newCompanyModal, setNewCompanyModal] = useState(false);
+  const [newCompanyInitialName, setNewCompanyInitialName] = useState("");
+
+  // ── Workorder selector ───────────────────────────────────────────
+  const [woOptions, setWoOptions] = useState<WOOption[]>([]);
+  const [woLoading, setWoLoading] = useState(false);
+  const [selectedWoId, setSelectedWoId] = useState(prefilledWoId ?? "");
+  const [selectedWoNumber, setSelectedWoNumber] = useState(prefilledWoNumber ?? "");
+
+  // ── Request info ─────────────────────────────────────────────────
   const [urgency, setUrgency] = useState(false);
   const [deadline, setDeadline] = useState("");
   const [designCount, setDesignCount] = useState("1");
   const [shippingInfoRequired, setShippingInfoRequired] = useState(false);
 
-  // Product spec
+  // ── Product spec ─────────────────────────────────────────────────
   const [molds, setMolds] = useState<MoldEntry[]>([
     { id: "1", type: "existing", value: "" },
   ]);
@@ -57,7 +157,7 @@ export default function QuoteRequestForm({
   const [printingNotes, setPrintingNotes] = useState("");
   const [embossmentNotes, setEmbossmentNotes] = useState("");
 
-  // Quantity tiers
+  // ── Quantity tiers ────────────────────────────────────────────────
   const [tiers, setTiers] = useState<QuantityTier[]>([
     { id: "1", tier_label: "A", quantity_type: "units", quantity: "", tier_notes: "" },
     { id: "2", tier_label: "B", quantity_type: "units", quantity: "", tier_notes: "" },
@@ -65,49 +165,96 @@ export default function QuoteRequestForm({
 
   const [internalNotes, setInternalNotes] = useState("");
 
-  // ── Mold handlers ──────────────────────────────────────────────
-  const addMold = () => {
-    setMolds([...molds, { id: Date.now().toString(), type: "existing", value: "" }]);
+  // ── Company fetch ─────────────────────────────────────────────────
+  const fetchCompanies = async (q: string) => {
+    setCompanySearchLoading(true);
+    try {
+      const res = await fetch(`/api/companies?q=${encodeURIComponent(q)}`);
+      const data = await res.json() as { id: string; name: string; name_ja: string | null; city: string | null; prefecture: string | null }[];
+      setCompanyOptions(data.map((c) => ({
+        value: c.id,
+        label: c.name,
+        sublabel: [c.name_ja, c.city, c.prefecture].filter(Boolean).join(" · ") || undefined,
+      })));
+    } catch { /* ignore */ } finally {
+      setCompanySearchLoading(false);
+    }
   };
 
-  const removeMold = (id: string) => {
-    if (molds.length <= 1) return;
-    setMolds(molds.filter((m) => m.id !== id));
+  // ── Workorder fetch (when company changes) ────────────────────────
+  const fetchWorkorders = async (companyId: string) => {
+    setWoLoading(true);
+    setSelectedWoId("");
+    setSelectedWoNumber("");
+    try {
+      const res = await fetch(`/api/workorders?company_id=${companyId}`);
+      const data = await res.json() as WOOption[];
+      setWoOptions(data);
+    } catch { /* ignore */ } finally {
+      setWoLoading(false);
+    }
   };
 
-  const updateMold = (id: string, field: keyof MoldEntry, value: string) => {
+  useEffect(() => {
+    fetchCompanies("");
+    // Pre-fill company option label so combobox displays it
+    if (prefilledCompanyId && prefilledCompanyName) {
+      setCompanyOptions([{ value: prefilledCompanyId, label: prefilledCompanyName }]);
+    }
+    // Pre-fill WO options so the select shows the pre-selected WO
+    if (prefilledCompanyId) {
+      fetchWorkorders(prefilledCompanyId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleCompanySelect = (option: ComboboxOption) => {
+    setSelectedCompanyId(option.value);
+    setSelectedCompanyName(option.label);
+    fetchWorkorders(option.value);
+  };
+
+  const handleAddNewCompany = (name: string) => {
+    setNewCompanyInitialName(name);
+    setNewCompanyModal(true);
+  };
+
+  const handleCompanyCreated = (company: { id: string; name: string; name_ja: string | null }) => {
+    setSelectedCompanyId(company.id);
+    setSelectedCompanyName(company.name);
+    setCompanyOptions((prev) => [
+      { value: company.id, label: company.name, sublabel: company.name_ja ?? undefined },
+      ...prev.filter((o) => o.value !== company.id),
+    ]);
+    setNewCompanyModal(false);
+    fetchWorkorders(company.id);
+  };
+
+  // ── Mold handlers ──────────────────────────────────────────────────
+  const addMold = () => setMolds([...molds, { id: Date.now().toString(), type: "existing", value: "" }]);
+  const removeMold = (id: string) => { if (molds.length > 1) setMolds(molds.filter((m) => m.id !== id)); };
+  const updateMold = (id: string, field: keyof MoldEntry, value: string) =>
     setMolds(molds.map((m) => m.id === id ? { ...m, [field]: value } : m));
-  };
 
-  // ── Tier handlers ───────────────────────────────────────────────
+  // ── Tier handlers ───────────────────────────────────────────────────
   const addTier = () => {
     if (tiers.length >= 6) return;
-    setTiers([...tiers, {
-      id: Date.now().toString(),
-      tier_label: TIER_LABELS[tiers.length],
-      quantity_type: "units",
-      quantity: "",
-      tier_notes: "",
-    }]);
+    setTiers([...tiers, { id: Date.now().toString(), tier_label: TIER_LABELS[tiers.length], quantity_type: "units", quantity: "", tier_notes: "" }]);
   };
-
-  const removeTier = (id: string) => {
-    if (tiers.length <= 1) return;
-    setTiers(tiers.filter((t) => t.id !== id));
-  };
-
-  const updateTier = (id: string, field: keyof QuantityTier, value: string) => {
+  const removeTier = (id: string) => { if (tiers.length > 1) setTiers(tiers.filter((t) => t.id !== id)); };
+  const updateTier = (id: string, field: keyof QuantityTier, value: string) =>
     setTiers(tiers.map((t) => t.id === id ? { ...t, [field]: value } : t));
-  };
 
-  // ── Submit ──────────────────────────────────────────────────────
+  // ── Submit ──────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedCompanyId) { setError("Please select a company."); return; }
+    if (!selectedWoId) { setError("Please select a workorder."); return; }
     setLoading(true);
     setError("");
 
     const payload = {
-      wo_id: woId,
+      wo_id: selectedWoId,
       urgency,
       deadline: deadline || null,
       design_count: parseInt(designCount) || 1,
@@ -146,278 +293,286 @@ export default function QuoteRequestForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* WO Reference */}
-      <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <span className="text-sm text-blue-700 font-medium">{t("workOrder")}:</span>
-        <span className="font-mono font-bold text-blue-800">{woNumber}</span>
-      </div>
+    <>
+      <form onSubmit={handleSubmit} className="space-y-6">
 
-      {/* Request Info */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">{t("requestInfo")}</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-center gap-6">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={urgency}
-                onChange={(e) => setUrgency(e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-sm font-medium">{t("urgency")}</span>
-              {urgency && <Badge variant="destructive" className="text-xs">URGENT</Badge>}
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={shippingInfoRequired}
-                onChange={(e) => setShippingInfoRequired(e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-sm font-medium">{t("shippingInfoRequired")}</span>
-            </label>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+        {/* Company + Workorder */}
+        <Card>
+          <CardHeader><CardTitle className="text-base">{tw("title")} &amp; {t("customer")}</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="deadline">{t("deadline")}</Label>
-              <Input
-                id="deadline"
-                type="datetime-local"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                required
+              <Label>
+                {tw("company")} <span className="text-red-500">*</span>
+              </Label>
+              <Combobox
+                options={companyOptions}
+                value={selectedCompanyId}
+                onSelect={handleCompanySelect}
+                onSearch={fetchCompanies}
+                onAddNew={handleAddNewCompany}
+                placeholder="Search company..."
+                loading={companySearchLoading}
+                addNewLabel="Add new company"
               />
+              {selectedCompanyId && (
+                <p className="text-xs text-green-600">✓ {selectedCompanyName}</p>
+              )}
             </div>
-            <div className="space-y-2">
-              <Label>{t("designCount")}</Label>
-              <Select value={designCount} onValueChange={(v) => v && setDesignCount(v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <SelectItem key={n} value={String(n)}>
-                      {n} {t("design")}{n > 1 ? "s" : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Product Spec */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">{t("productSpec")}</CardTitle></CardHeader>
-        <CardContent className="space-y-5">
-
-          {/* Molds */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label>{t("molds")}</Label>
-              <Button type="button" variant="outline" size="sm" onClick={addMold} className="gap-1 h-7 text-xs">
-                <Plus className="h-3 w-3" />
-                {t("addMold")}
-              </Button>
-            </div>
             <div className="space-y-2">
-              {molds.map((mold) => (
-                <div key={mold.id} className="flex items-center gap-2">
-                  <Select
-                    value={mold.type}
-                    onValueChange={(v) => v && updateMold(mold.id, "type", v)}
-                  >
-                    <SelectTrigger className="w-36 shrink-0 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="existing">{t("existing")}</SelectItem>
-                      <SelectItem value="new">{t("newMold")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    className="flex-1 text-sm"
-                    value={mold.value}
-                    onChange={(e) => updateMold(mold.id, "value", e.target.value)}
-                    placeholder={mold.type === "existing" ? "ML-1004B" : t("newMoldPlaceholder")}
-                  />
+              <Label>
+                {tw("title")} <span className="text-red-500">*</span>
+              </Label>
+              {!selectedCompanyId ? (
+                <div className="flex items-center h-9 px-3 rounded-md border border-dashed border-gray-300 text-sm text-gray-400">
+                  Select a company first
+                </div>
+              ) : woLoading ? (
+                <div className="flex items-center h-9 px-3 rounded-md border border-gray-200 text-sm text-gray-400">
+                  Loading workorders...
+                </div>
+              ) : woOptions.length === 0 ? (
+                <div className="flex items-center justify-between h-9 px-3 rounded-md border border-dashed border-amber-300 bg-amber-50 text-sm text-amber-700">
+                  No workorders for this company.
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => removeMold(mold.id)}
-                    disabled={molds.length <= 1}
-                    className="shrink-0 px-2"
+                    className="text-xs h-6 text-amber-700 hover:text-amber-900"
+                    onClick={() => router.push(`/${locale}/workorders/new?company_id=${selectedCompanyId}&company_name=${encodeURIComponent(selectedCompanyName)}`)}
                   >
-                    <Trash2 className="h-3.5 w-3.5 text-gray-400" />
+                    Create one →
                   </Button>
                 </div>
-              ))}
+              ) : (
+                <Select
+                  value={selectedWoId}
+                  onValueChange={(v) => {
+                    const wo = woOptions.find((w) => w.id === v);
+                    if (wo) { setSelectedWoId(wo.id); setSelectedWoNumber(wo.wo_number); }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select workorder..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {woOptions.map((wo) => (
+                      <SelectItem key={wo.id} value={wo.id}>
+                        <span className="font-mono font-medium">{wo.wo_number}</span>
+                        <span className="text-gray-500 ml-2">— {wo.project_name}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              {selectedWoId && (
+                <p className="text-xs text-green-600">✓ {selectedWoNumber}</p>
+              )}
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Size */}
-          <div className="space-y-2">
-            <Label htmlFor="size">{t("sizeDimensions")}</Label>
-            <Input
-              id="size"
-              value={sizeDimensions}
-              onChange={(e) => setSizeDimensions(e.target.value)}
-              placeholder="e.g. 200×200×40mm BH"
-            />
-          </div>
+        {/* Request Info */}
+        <Card>
+          <CardHeader><CardTitle className="text-base">{t("requestInfo")}</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap items-center gap-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={urgency} onChange={(e) => setUrgency(e.target.checked)} className="rounded" />
+                <span className="text-sm font-medium">{t("urgency")}</span>
+                {urgency && <Badge variant="destructive" className="text-xs">URGENT</Badge>}
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={shippingInfoRequired} onChange={(e) => setShippingInfoRequired(e.target.checked)} className="rounded" />
+                <span className="text-sm font-medium">{t("shippingInfoRequired")}</span>
+              </label>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="deadline">{t("deadline")} <span className="text-red-500">*</span></Label>
+                <Input id="deadline" type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label>{t("designCount")}</Label>
+                <Select value={designCount} onValueChange={(v) => v && setDesignCount(v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <SelectItem key={n} value={String(n)}>{n} {t("design")}{n > 1 ? "s" : ""}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Printing */}
-          <div className="space-y-2">
-            <Label htmlFor="printing">{t("printing")}</Label>
-            <textarea
-              id="printing"
-              className="w-full min-h-[72px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              value={printingNotes}
-              onChange={(e) => setPrintingNotes(e.target.value)}
-              placeholder="e.g. White base coat + CMYK + gloss varnish. Lid: matte finish."
-            />
-          </div>
+        {/* Product Spec */}
+        <Card>
+          <CardHeader><CardTitle className="text-base">{t("productSpec")}</CardTitle></CardHeader>
+          <CardContent className="space-y-5">
 
-          {/* Embossment */}
-          <div className="space-y-2">
-            <Label htmlFor="embossment">
-              {t("embossment")}
-              <span className="text-gray-400 text-xs font-normal ml-2">{t("embossmentHint")}</span>
-            </Label>
-            <Input
-              id="embossment"
-              value={embossmentNotes}
-              onChange={(e) => setEmbossmentNotes(e.target.value)}
-              placeholder={t("embossmentComponentsPlaceholder")}
-            />
-          </div>
-
-        </CardContent>
-      </Card>
-
-      {/* Quantity Tiers */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
-          <CardTitle className="text-base">{t("quantityTiers")}</CardTitle>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addTier}
-            disabled={tiers.length >= 6}
-            className="gap-1 h-7 text-xs"
-          >
-            <Plus className="h-3 w-3" />
-            {t("addTier")}
-          </Button>
-        </CardHeader>
-        <CardContent className="p-0">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left text-xs font-medium text-gray-500 px-4 py-2 w-10">{t("tier")}</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-3 py-2 w-36">{t("quantityType")}</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-3 py-2 w-40">{t("quantity")}</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-3 py-2">{t("notes")}</th>
-                <th className="w-8"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {tiers.map((tier) => (
-                <tr key={tier.id} className="align-middle">
-                  <td className="px-4 py-2">
-                    <span className="flex items-center justify-center h-7 w-7 rounded bg-gray-100 text-xs font-bold text-gray-600">
-                      {tier.tier_label}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select
-                      value={tier.quantity_type}
-                      onValueChange={(v) => v && updateTier(tier.id, "quantity_type", v)}
-                    >
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+            {/* Molds */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>{t("molds")}</Label>
+                <Button type="button" variant="outline" size="sm" onClick={addMold} className="gap-1 h-7 text-xs">
+                  <Plus className="h-3 w-3" />
+                  {t("addMold")}
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {molds.map((mold) => (
+                  <div key={mold.id} className="flex items-center gap-2">
+                    <Select value={mold.type} onValueChange={(v) => v && updateMold(mold.id, "type", v)}>
+                      <SelectTrigger className="w-36 shrink-0 text-sm"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="units">{t("units")}</SelectItem>
-                        <SelectItem value="fcl_20ft">{t("fcl20ft")}</SelectItem>
-                        <SelectItem value="fcl_40ft">{t("fcl40ft")}</SelectItem>
+                        <SelectItem value="existing">{t("existing")}</SelectItem>
+                        <SelectItem value="new">{t("newMold")}</SelectItem>
                       </SelectContent>
                     </Select>
-                  </td>
-                  <td className="px-3 py-2">
-                    {tier.quantity_type === "units" ? (
-                      <Input
-                        type="number"
-                        min="1"
-                        value={tier.quantity}
-                        onChange={(e) => updateTier(tier.id, "quantity", e.target.value)}
-                        placeholder="e.g. 20,000"
-                        className="h-8 text-sm"
-                      />
-                    ) : (
-                      <span className="inline-flex items-center px-2 py-1 rounded bg-amber-50 border border-amber-200 text-xs text-amber-700">
-                        {tier.quantity_type === "fcl_20ft" ? "20ft" : "40ft"} — {t("fclCalcNote")}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2">
                     <Input
-                      value={tier.tier_notes}
-                      onChange={(e) => updateTier(tier.id, "tier_notes", e.target.value)}
-                      placeholder={t("tierNotesPlaceholder")}
-                      className="h-8 text-sm"
+                      className="flex-1 text-sm"
+                      value={mold.value}
+                      onChange={(e) => updateMold(mold.id, "value", e.target.value)}
+                      placeholder={mold.type === "existing" ? "ML-1004B" : t("newMoldPlaceholder")}
                     />
-                  </td>
-                  <td className="pr-3 py-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeTier(tier.id)}
-                      disabled={tiers.length <= 1}
-                      className="h-7 w-7 p-0"
-                    >
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeMold(mold.id)} disabled={molds.length <= 1} className="shrink-0 px-2">
                       <Trash2 className="h-3.5 w-3.5 text-gray-400" />
                     </Button>
-                  </td>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Size */}
+            <div className="space-y-2">
+              <Label htmlFor="size">{t("sizeDimensions")}</Label>
+              <Input id="size" value={sizeDimensions} onChange={(e) => setSizeDimensions(e.target.value)} placeholder="e.g. 200×200×40mm BH" />
+            </div>
+
+            {/* Printing */}
+            <div className="space-y-2">
+              <Label>{t("printing")}</Label>
+              <textarea
+                className="w-full min-h-[72px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                value={printingNotes}
+                onChange={(e) => setPrintingNotes(e.target.value)}
+                placeholder="e.g. White base coat + CMYK + gloss varnish. Lid: matte finish."
+              />
+            </div>
+
+            {/* Embossment */}
+            <div className="space-y-2">
+              <Label>
+                {t("embossment")}
+                <span className="text-gray-400 text-xs font-normal ml-2">{t("embossmentHint")}</span>
+              </Label>
+              <Input
+                value={embossmentNotes}
+                onChange={(e) => setEmbossmentNotes(e.target.value)}
+                placeholder={t("embossmentComponentsPlaceholder")}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quantity Tiers */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base">{t("quantityTiers")}</CardTitle>
+            <Button type="button" variant="outline" size="sm" onClick={addTier} disabled={tiers.length >= 6} className="gap-1 h-7 text-xs">
+              <Plus className="h-3 w-3" />
+              {t("addTier")}
+            </Button>
+          </CardHeader>
+          <CardContent className="p-0">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50">
+                  <th className="text-left text-xs font-medium text-gray-500 px-4 py-2 w-10">{t("tier")}</th>
+                  <th className="text-left text-xs font-medium text-gray-500 px-3 py-2 w-36">{t("quantityType")}</th>
+                  <th className="text-left text-xs font-medium text-gray-500 px-3 py-2 w-40">{t("quantity")}</th>
+                  <th className="text-left text-xs font-medium text-gray-500 px-3 py-2">{t("notes")}</th>
+                  <th className="w-8"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {tiers.map((tier) => (
+                  <tr key={tier.id} className="align-middle">
+                    <td className="px-4 py-2">
+                      <span className="flex items-center justify-center h-7 w-7 rounded bg-gray-100 text-xs font-bold text-gray-600">
+                        {tier.tier_label}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2">
+                      <Select value={tier.quantity_type} onValueChange={(v) => v && updateTier(tier.id, "quantity_type", v)}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="units">{t("units")}</SelectItem>
+                          <SelectItem value="fcl_20ft">{t("fcl20ft")}</SelectItem>
+                          <SelectItem value="fcl_40ft">{t("fcl40ft")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="px-3 py-2">
+                      {tier.quantity_type === "units" ? (
+                        <Input type="number" min="1" value={tier.quantity} onChange={(e) => updateTier(tier.id, "quantity", e.target.value)} placeholder="e.g. 20,000" className="h-8 text-sm" />
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded bg-amber-50 border border-amber-200 text-xs text-amber-700">
+                          {tier.quantity_type === "fcl_20ft" ? "20ft" : "40ft"} — {t("fclCalcNote")}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      <Input value={tier.tier_notes} onChange={(e) => updateTier(tier.id, "tier_notes", e.target.value)} placeholder={t("tierNotesPlaceholder")} className="h-8 text-sm" />
+                    </td>
+                    <td className="pr-3 py-2">
+                      <Button type="button" variant="ghost" size="sm" onClick={() => removeTier(tier.id)} disabled={tiers.length <= 1} className="h-7 w-7 p-0">
+                        <Trash2 className="h-3.5 w-3.5 text-gray-400" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
 
-      {/* Internal Notes */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">{t("internalNotes")}</CardTitle></CardHeader>
-        <CardContent>
-          <div className="flex items-start gap-2 mb-2">
-            <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-            <p className="text-xs text-gray-500">{t("internalNotesHint")}</p>
-          </div>
-          <textarea
-            className="w-full min-h-[90px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            value={internalNotes}
-            onChange={(e) => setInternalNotes(e.target.value)}
-            placeholder={t("internalNotesPlaceholder")}
-          />
-        </CardContent>
-      </Card>
+        {/* Internal Notes */}
+        <Card>
+          <CardHeader><CardTitle className="text-base">{t("internalNotes")}</CardTitle></CardHeader>
+          <CardContent>
+            <div className="flex items-start gap-2 mb-2">
+              <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+              <p className="text-xs text-gray-500">{t("internalNotesHint")}</p>
+            </div>
+            <textarea
+              className="w-full min-h-[90px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              value={internalNotes}
+              onChange={(e) => setInternalNotes(e.target.value)}
+              placeholder={t("internalNotesPlaceholder")}
+            />
+          </CardContent>
+        </Card>
 
-      {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-          {error}
+        {error && (
+          <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+        )}
+
+        <div className="flex gap-3 justify-end">
+          <Button type="button" variant="outline" onClick={() => router.back()}>{tc("cancel")}</Button>
+          <Button type="submit" disabled={loading}>{loading ? tc("loading") : t("submitRequest")}</Button>
         </div>
-      )}
+      </form>
 
-      <div className="flex gap-3 justify-end">
-        <Button type="button" variant="outline" onClick={() => router.back()}>
-          {tc("cancel")}
-        </Button>
-        <Button type="submit" disabled={loading}>
-          {loading ? tc("loading") : t("submitRequest")}
-        </Button>
-      </div>
-    </form>
+      <Modal open={newCompanyModal} onClose={() => setNewCompanyModal(false)} title="Add New Company">
+        <QuickCompanyForm
+          initialName={newCompanyInitialName}
+          onCreated={handleCompanyCreated}
+          onCancel={() => setNewCompanyModal(false)}
+        />
+      </Modal>
+    </>
   );
 }

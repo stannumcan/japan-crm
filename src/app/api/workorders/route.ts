@@ -2,14 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { formatWONumber } from "@/lib/calculations";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
+  const { searchParams } = new URL(request.url);
+  const companyId = searchParams.get("company_id");
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
+  let query = (supabase as any)
     .from("work_orders")
     .select("*, quotations(id, status, quote_version, created_at)")
     .order("created_at", { ascending: false });
 
+  if (companyId) query = query.eq("company_id", companyId);
+
+  const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
@@ -17,12 +23,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const body = await request.json();
-  const { company_name, project_name, region = "JP", created_by } = body;
+  const { company_name, company_id, project_name, region = "JP", created_by } = body;
 
-  // Get current year (2-digit)
   const yearCode = new Date().getFullYear().toString().slice(-2);
 
-  // Get next sequence number for this region+year
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: lastWO } = await (supabase as any)
     .from("work_orders")
@@ -45,6 +49,7 @@ export async function POST(request: NextRequest) {
       year_code: yearCode,
       sequence_number: nextSeq,
       company_name,
+      company_id: company_id || null,
       project_name,
       created_by,
     })

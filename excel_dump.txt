@@ -1,0 +1,1312 @@
+====================================================================================================
+  FILE 1: USJ Star Tin見積算出フォーマット (filled example)
+  Path: C:/Users/wilfr/OneDrive/AI/Japan/Forms/USJ Star Tin見積算出フォーマット.xlsx
+====================================================================================================
+
+SHEET NAMES: ['発注数量別単価計算表', '20ft FCL', '40ft FCL', 'フルコン複数']
+
+
+################################################################################
+  SHEET: "発注数量別単価計算表"
+  Dimensions: A1:J69  Max row: 69, Max col: 10
+################################################################################
+
+  MERGED CELLS: ['D50:D53', 'B62:C62', 'B3:C3', 'D34:D37', 'B15:C16', 'E5:F5', 'B46:C46', 'D46:E46', 'B12:C12', 'E4:F4', 'B2:C2', 'F30:G30', 'A24:C27', 'E2:J2', 'A40:C43', 'B67:C67', 'B61:C61', 'B60:C60', 'B14:C14', 'B1:F1', 'B17:C17', 'B63:C64', 'B13:C13', 'D66:D69', 'B44:C44', 'F62:G62', 'D18:D21', 'B29:C29', 'A8:A11', 'B19:C19', 'B28:C28', 'G5:H5', 'B31:C32', 'F46:G46', 'I5:J5', 'D62:E62', 'A47:A48', 'A63:A64', 'A56:C59', 'E3:J3', 'B49:C49', 'B65:C65', 'E6:J7', 'B47:C48', 'H1:J1', 'A4:A7', 'G4:H4', 'B30:C30', 'I4:J4', 'D30:E30', 'B33:C33', 'B51:C51', 'B45:C45', 'A15:A16', 'D14:E14', 'F14:G14', 'A31:A32', 'D6:D7', 'B35:C35']
+
+  --- CELL DATA ---
+  [A1] VALUE: 'Customer’s Name'
+  [B1] VALUE: 'Tanaka Sangyo'
+  [G1] VALUE: 'Date'
+  [A2] VALUE: 'Style'
+  [B2] VALUE: 'Star Tin (New Mold)'
+  [D2] VALUE: '缶サイズ'
+  [E2] VALUE: '200x200x50 mm'
+  [A3] VALUE: '入数/箱'
+  [B3] VALUE: 24
+  [D3] VALUE: '印刷仕様'
+  [E3] VALUE: 'outside:White coating + Yellow x 2 + CMYK + Glossy\ninside:Glod finished'
+  [A4] VALUE: '箱サイズ'
+  [B4] VALUE: '縦(mm)'
+  [C4] VALUE: 432
+  [D4] VALUE: '金型費用'
+  [G4] VALUE: 'エンボス作成期間'
+  [B5] VALUE: '横(mm)'
+  [C5] VALUE: 422
+  [D5] VALUE: '金型変更費用'
+  [G5] VALUE: '金型変更期間'
+  [B6] VALUE: '高さ(mm)'
+  [C6] VALUE: 358
+  [D6] VALUE: 'その他'
+  [B7] VALUE: '箱CBM'
+  [C7] FORMULA: =C4*C5*C6/1000000000  | cached_value: 0.065264832
+  [A8] VALUE: 'ﾊﾟﾚｯﾄｻｲｽﾞ'
+  [B8] VALUE: '縦(mm)'
+  [C8] VALUE: 1280
+  [D8] VALUE: '顧客発注数'
+  [E8] FORMULA: =B15  | cached_value: 20000
+  [B9] VALUE: '横(mm)'
+  [C9] VALUE: 880
+  [D9] VALUE: '製造単価'
+  [E9] VALUE: 8.95
+  [G9] VALUE: '20ftフルコン以下の場合、輸送コストのMAXは'
+  [B10] VALUE: '高さ(mm)'
+  [C10] VALUE: 120
+  [D10] VALUE: '工場製造数量'
+  [E10] FORMULA: =B19  | cached_value: 20880
+  [G10] VALUE: '250,000円につき、それ以上の場合には250,000円'
+  [B11] VALUE: 'ﾊﾟﾚCBM'
+  [C11] FORMULA: =C8*C9*C10/1000000000  | cached_value: 0.135168
+  [D11] VALUE: '為替ﾚｰﾄRMB'
+  [E11] VALUE: 23
+  [G11] VALUE: 'で手入力する'
+  [A12] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [B12] VALUE: 30
+  [D12] VALUE: '現地製造ｺｽﾄ'
+  [E12] FORMULA: =E10*E9*E11  | cached_value: 4298147.999999999
+  [A13] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B13] FORMULA: =B3*B12  | cached_value: 720
+  [D13] VALUE: '輸送ｺｽﾄLCL'
+  [E13] VALUE: 800000
+  [F13] VALUE: '輸送ｺｽﾄ20ft'
+  [G13] VALUE: 250000
+  [H13] VALUE: '輸送ｺｽﾄ40ft'
+  [I13] VALUE: 400000
+  [J13] VALUE: '←選択'
+  [A14] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B14] FORMULA: =C7*B12+C11  | cached_value: 2.09311296
+  [D14] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F14] FORMULA: =E12+E13  | cached_value: 5098147.999999999
+  [A15] VALUE: '顧客発注数'
+  [B15] VALUE: 20000
+  [D15] VALUE: '輸入関税(4%)'
+  [E15] FORMULA: =F14*0.04  | cached_value: 203925.91999999995
+  [D16] VALUE: '輸入消費税'
+  [E16] VALUE: 0
+  [A17] VALUE: '顧客発注数＋５％'
+  [B17] FORMULA: =B15*1.05  | cached_value: 21000
+  [D17] VALUE: '総コスト'
+  [E17] FORMULA: =F14+E15+E16  | cached_value: 5302073.919999999
+  [A18] VALUE: '製造依頼ｶｰﾄﾝ数'
+  [B18] FORMULA: =B17/B3  | cached_value: 875
+  [C18] VALUE: 870
+  [D18] VALUE: '利益率別単価'
+  [E18] VALUE: 0.6
+  [F18] FORMULA: =E17*1.6  | cached_value: 8483318.271999998
+  [G18] FORMULA: =F18/E8  | cached_value: 424.1659135999999
+  [H18] VALUE: 0.55
+  [I18] FORMULA: =E17*1.55  | cached_value: 8218214.5759999985
+  [J18] FORMULA: =I18/E8  | cached_value: 410.9107287999999
+  [A19] VALUE: '工場製造数量'
+  [B19] FORMULA: =B3*C18  | cached_value: 20880
+  [E19] VALUE: 0.5
+  [F19] FORMULA: =E17*1.5  | cached_value: 7953110.879999999
+  [G19] FORMULA: =F19/E8  | cached_value: 397.65554399999996
+  [H19] VALUE: 0.45
+  [I19] FORMULA: =E17*1.45  | cached_value: 7688007.1839999985
+  [J19] FORMULA: =I19/E8  | cached_value: 384.4003591999999
+  [A20] VALUE: 'ﾊﾟﾚｯﾄ数'
+  [B20] FORMULA: =C18/B12  | cached_value: 29
+  [C20] FORMULA: =ROUNDUP(B20, 0)  | cached_value: 29
+  [E20] VALUE: 0.4
+  [F20] FORMULA: =E17*1.4  | cached_value: 7422903.487999998
+  [G20] FORMULA: =F20/E8  | cached_value: 371.1451743999999
+  [H20] VALUE: 0.35
+  [I20] FORMULA: =E17*1.35  | cached_value: 7157799.791999999
+  [J20] FORMULA: =I20/E8  | cached_value: 357.8899896
+  [A21] VALUE: '輸送サイズ'
+  [B21] FORMULA: =B14*C20  | cached_value: 60.70027584
+  [C21] FORMULA: =ROUNDUP(B21, 0)  | cached_value: 61
+  [E21] VALUE: 0.3
+  [F21] FORMULA: =E17*1.3  | cached_value: 6892696.095999999
+  [G21] FORMULA: =F21/E8  | cached_value: 344.6348047999999
+  [H21] VALUE: 0.25
+  [I21] FORMULA: =E17*1.25  | cached_value: 6627592.3999999985
+  [J21] FORMULA: =I21/E8  | cached_value: 331.37961999999993
+  [A24] VALUE: '同条件・ロット違いの場合'
+  [D24] VALUE: '顧客発注数'
+  [E24] FORMULA: =B31  | cached_value: 30000
+  [D25] VALUE: '製造単価'
+  [E25] VALUE: 8.81
+  [D26] VALUE: '工場製造数量'
+  [E26] FORMULA: =B35  | cached_value: 31320
+  [D27] VALUE: '為替ﾚｰﾄRMB'
+  [E27] VALUE: 23
+  [A28] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [B28] FORMULA: =B12  | cached_value: 30
+  [D28] VALUE: '現地製造ｺｽﾄ'
+  [E28] FORMULA: =E26*E25*E27  | cached_value: 6346371.600000001
+  [A29] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B29] FORMULA: =B13  | cached_value: 720
+  [D29] VALUE: '輸送ｺｽﾄLCL'
+  [E29] VALUE: 800000
+  [F29] VALUE: '輸送ｺｽﾄ20ft'
+  [G29] VALUE: 250000
+  [H29] VALUE: '輸送ｺｽﾄ40ft'
+  [I29] VALUE: 400000
+  [J29] VALUE: '←選択'
+  [A30] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B30] FORMULA: =B14  | cached_value: 2.09311296
+  [D30] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F30] FORMULA: =E28+E29  | cached_value: 7146371.600000001
+  [A31] VALUE: '顧客発注数'
+  [B31] VALUE: 30000
+  [D31] VALUE: '輸入関税(4%)'
+  [E31] FORMULA: =F30*0.04  | cached_value: 285854.864
+  [D32] VALUE: '輸入消費税'
+  [E32] VALUE: 0
+  [A33] VALUE: '顧客発注数＋５％'
+  [B33] FORMULA: =B31*1.05  | cached_value: 31500
+  [D33] VALUE: '総コスト'
+  [E33] FORMULA: =F30+E31+E32  | cached_value: 7432226.464000001
+  [A34] VALUE: '製造依頼ｶｰﾄﾝ数'
+  [B34] FORMULA: =B33/B3  | cached_value: 1312.5
+  [C34] VALUE: 1305
+  [D34] VALUE: '利益率別単価'
+  [E34] VALUE: 0.6
+  [F34] FORMULA: =E33*1.6  | cached_value: 11891562.342400001
+  [G34] FORMULA: =F34/E24  | cached_value: 396.3854114133334
+  [H34] VALUE: 0.55
+  [I34] FORMULA: =E33*1.55  | cached_value: 11519951.0192
+  [J34] FORMULA: =I34/E24  | cached_value: 383.9983673066667
+  [A35] VALUE: '工場製造数量'
+  [B35] FORMULA: =B3*C34  | cached_value: 31320
+  [E35] VALUE: 0.5
+  [F35] FORMULA: =E33*1.5  | cached_value: 11148339.696
+  [G35] FORMULA: =F35/E24  | cached_value: 371.6113232
+  [H35] VALUE: 0.45
+  [I35] FORMULA: =E33*1.45  | cached_value: 10776728.3728
+  [J35] FORMULA: =I35/E24  | cached_value: 359.22427909333334
+  [A36] VALUE: 'ﾊﾟﾚｯﾄ数'
+  [B36] FORMULA: =C34/B12  | cached_value: 43.5
+  [C36] FORMULA: =ROUNDUP(B36, 0)  | cached_value: 44
+  [E36] VALUE: 0.4
+  [F36] FORMULA: =E33*1.4  | cached_value: 10405117.0496
+  [G36] FORMULA: =F36/E24  | cached_value: 346.83723498666666
+  [H36] VALUE: 0.35
+  [I36] FORMULA: =E33*1.35  | cached_value: 10033505.726400001
+  [J36] FORMULA: =I36/E24  | cached_value: 334.45019088000004
+  [A37] VALUE: '輸送サイズ'
+  [B37] FORMULA: =B30*C36  | cached_value: 92.09697024
+  [C37] FORMULA: =ROUNDUP(B37, 0)  | cached_value: 93
+  [E37] VALUE: 0.3
+  [F37] FORMULA: =E33*1.3  | cached_value: 9661894.4032
+  [G37] FORMULA: =F37/E24  | cached_value: 322.06314677333336
+  [H37] VALUE: 0.25
+  [I37] FORMULA: =E33*1.25  | cached_value: 9290283.08
+  [J37] FORMULA: =I37/E24  | cached_value: 309.6761026666667
+  [A40] VALUE: '同条件・ロット違いの場合'
+  [D40] VALUE: '顧客発注数'
+  [E40] FORMULA: =B47  | cached_value: 0
+  [D41] VALUE: '製造単価'
+  [D42] VALUE: '工場製造数量'
+  [E42] FORMULA: =B51  | cached_value: 0
+  [D43] VALUE: '為替ﾚｰﾄRMB'
+  [E43] VALUE: 23
+  [A44] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [B44] FORMULA: =B12  | cached_value: 30
+  [D44] VALUE: '現地製造ｺｽﾄ'
+  [E44] FORMULA: =E42*E41*E43  | cached_value: 0
+  [A45] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B45] FORMULA: =B13  | cached_value: 720
+  [D45] VALUE: '輸送ｺｽﾄLCL'
+  [E45] FORMULA: =C53*23000+10000  | cached_value: 10000
+  [F45] VALUE: '輸送ｺｽﾄ20ft'
+  [G45] VALUE: 250000
+  [H45] VALUE: '輸送ｺｽﾄ40ft'
+  [I45] VALUE: 400000
+  [J45] VALUE: '←選択'
+  [A46] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B46] FORMULA: =B14  | cached_value: 2.09311296
+  [D46] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F46] FORMULA: =E44+E45  | cached_value: 10000
+  [A47] VALUE: '顧客発注数'
+  [D47] VALUE: '輸入関税(4%)'
+  [E47] FORMULA: =F46*0.04  | cached_value: 400
+  [D48] VALUE: '輸入消費税'
+  [E48] VALUE: 0
+  [A49] VALUE: '顧客発注数＋５％'
+  [B49] FORMULA: =B47*1.05  | cached_value: 0
+  [D49] VALUE: '総コスト'
+  [E49] FORMULA: =F46+E47+E48  | cached_value: 10400
+  [A50] VALUE: '製造依頼ｶｰﾄﾝ数'
+  [B50] FORMULA: =B49/B3  | cached_value: 0
+  [C50] FORMULA: =ROUNDDOWN(B50, 0)  | cached_value: 0
+  [D50] VALUE: '利益率別単価'
+  [E50] VALUE: 0.6
+  [F50] FORMULA: =E49*1.6  | cached_value: 16640
+  [G50] FORMULA: =F50/E40  | cached_value: '#DIV/0!'
+  [H50] VALUE: 0.55
+  [I50] FORMULA: =E49*1.55  | cached_value: 16120
+  [J50] FORMULA: =I50/E40  | cached_value: '#DIV/0!'
+  [A51] VALUE: '工場製造数量'
+  [B51] FORMULA: =B3*C50  | cached_value: 0
+  [E51] VALUE: 0.5
+  [F51] FORMULA: =E49*1.5  | cached_value: 15600
+  [G51] FORMULA: =F51/E40  | cached_value: '#DIV/0!'
+  [H51] VALUE: 0.45
+  [I51] FORMULA: =E49*1.45  | cached_value: 15080
+  [J51] FORMULA: =I51/E40  | cached_value: '#DIV/0!'
+  [A52] VALUE: 'ﾊﾟﾚｯﾄ数'
+  [B52] FORMULA: =C50/B12  | cached_value: 0
+  [C52] FORMULA: =ROUNDUP(B52, 0)  | cached_value: 0
+  [E52] VALUE: 0.4
+  [F52] FORMULA: =E49*1.4  | cached_value: 14559.999999999998
+  [G52] FORMULA: =F52/E40  | cached_value: '#DIV/0!'
+  [H52] VALUE: 0.35
+  [I52] FORMULA: =E49*1.35  | cached_value: 14040.000000000002
+  [J52] FORMULA: =I52/E40  | cached_value: '#DIV/0!'
+  [A53] VALUE: '輸送サイズ'
+  [B53] FORMULA: =B46*C52  | cached_value: 0
+  [C53] FORMULA: =ROUNDUP(B53, 0)  | cached_value: 0
+  [E53] VALUE: 0.3
+  [F53] FORMULA: =E49*1.3  | cached_value: 13520
+  [G53] FORMULA: =F53/E40  | cached_value: '#DIV/0!'
+  [H53] VALUE: 0.25
+  [I53] FORMULA: =E49*1.25  | cached_value: 13000
+  [J53] FORMULA: =I53/E40  | cached_value: '#DIV/0!'
+  [A56] VALUE: '同条件・ロット違いの場合'
+  [D56] VALUE: '顧客発注数'
+  [E56] FORMULA: =B63  | cached_value: 0
+  [D57] VALUE: '製造単価'
+  [D58] VALUE: '工場製造数量'
+  [E58] FORMULA: =B67  | cached_value: 0
+  [D59] VALUE: '為替ﾚｰﾄRMB'
+  [E59] VALUE: 23
+  [A60] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [B60] FORMULA: =B28  | cached_value: 30
+  [D60] VALUE: '現地製造ｺｽﾄ'
+  [E60] FORMULA: =E58*E57*E59  | cached_value: 0
+  [A61] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B61] FORMULA: =B29  | cached_value: 720
+  [D61] VALUE: '輸送ｺｽﾄLCL'
+  [E61] FORMULA: =C69*23000+10000  | cached_value: 10000
+  [F61] VALUE: '輸送ｺｽﾄ20ft'
+  [G61] VALUE: 250000
+  [H61] VALUE: '輸送ｺｽﾄ40ft'
+  [I61] VALUE: 400000
+  [J61] VALUE: '←選択'
+  [A62] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B62] FORMULA: =B30  | cached_value: 2.09311296
+  [D62] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F62] FORMULA: =E60+E61  | cached_value: 10000
+  [A63] VALUE: '顧客発注数'
+  [D63] VALUE: '輸入関税(4%)'
+  [E63] FORMULA: =F62*0.04  | cached_value: 400
+  [D64] VALUE: '輸入消費税'
+  [E64] VALUE: 0
+  [A65] VALUE: '顧客発注数＋５％'
+  [B65] FORMULA: =B63*1.05  | cached_value: 0
+  [D65] VALUE: '総コスト'
+  [E65] FORMULA: =F62+E63+E64  | cached_value: 10400
+  [A66] VALUE: '製造依頼ｶｰﾄﾝ数'
+  [B66] FORMULA: =B65/B3  | cached_value: 0
+  [C66] FORMULA: =ROUNDDOWN(B66, 0)  | cached_value: 0
+  [D66] VALUE: '利益率別単価'
+  [E66] VALUE: 0.6
+  [F66] FORMULA: =E65*1.6  | cached_value: 16640
+  [G66] FORMULA: =F66/E56  | cached_value: '#DIV/0!'
+  [H66] VALUE: 0.55
+  [I66] FORMULA: =E65*1.55  | cached_value: 16120
+  [J66] FORMULA: =I66/E56  | cached_value: '#DIV/0!'
+  [A67] VALUE: '工場製造数量'
+  [B67] FORMULA: =B3*C66  | cached_value: 0
+  [E67] VALUE: 0.5
+  [F67] FORMULA: =E65*1.5  | cached_value: 15600
+  [G67] FORMULA: =F67/E56  | cached_value: '#DIV/0!'
+  [H67] VALUE: 0.45
+  [I67] FORMULA: =E65*1.45  | cached_value: 15080
+  [J67] FORMULA: =I67/E56  | cached_value: '#DIV/0!'
+  [A68] VALUE: 'ﾊﾟﾚｯﾄ数'
+  [B68] FORMULA: =C66/B28  | cached_value: 0
+  [C68] FORMULA: =ROUNDUP(B68, 0)  | cached_value: 0
+  [E68] VALUE: 0.4
+  [F68] FORMULA: =E65*1.4  | cached_value: 14559.999999999998
+  [G68] FORMULA: =F68/E56  | cached_value: '#DIV/0!'
+  [H68] VALUE: 0.35
+  [I68] FORMULA: =E65*1.35  | cached_value: 14040.000000000002
+  [J68] FORMULA: =I68/E56  | cached_value: '#DIV/0!'
+  [A69] VALUE: '輸送サイズ'
+  [B69] FORMULA: =B62*C68  | cached_value: 0
+  [C69] FORMULA: =ROUNDUP(B69, 0)  | cached_value: 0
+  [E69] VALUE: 0.3
+  [F69] FORMULA: =E65*1.3  | cached_value: 13520
+  [G69] FORMULA: =F69/E56  | cached_value: '#DIV/0!'
+  [H69] VALUE: 0.25
+  [I69] FORMULA: =E65*1.25  | cached_value: 13000
+  [J69] FORMULA: =I69/E56  | cached_value: '#DIV/0!'
+
+################################################################################
+  SHEET: "20ft FCL"
+  Dimensions: A1:J20  Max row: 20, Max col: 10
+################################################################################
+
+  MERGED CELLS: ['B3:C3', 'B19:C20', 'B15:C16', 'E5:F5', 'B12:C12', 'E4:F4', 'B2:C2', 'E2:J2', 'D17:D20', 'D13:E13', 'B14:C14', 'B1:F1', 'B17:C17', 'B13:C13', 'A8:A11', 'G5:H5', 'I5:J5', 'F13:G13', 'E3:J3', 'A19:A20', 'E6:J7', 'H1:J1', 'A4:A7', 'G4:H4', 'I4:J4', 'A15:A16', 'D6:D7']
+
+  --- CELL DATA ---
+  [A1] VALUE: 'Customer’s Name'
+  [G1] VALUE: 'Date'
+  [H1] VALUE: '2024.00.00'
+  [A2] VALUE: 'Style'
+  [B2] VALUE: 'ML-'
+  [D2] VALUE: '缶サイズ'
+  [A3] VALUE: '入数/箱'
+  [D3] VALUE: '印刷仕様'
+  [A4] VALUE: '箱サイズ'
+  [B4] VALUE: '縦(mm)'
+  [D4] VALUE: '金型費用'
+  [G4] VALUE: 'エンボス作成期間'
+  [I4] VALUE: '2-3 Weeks'
+  [B5] VALUE: '横(mm)'
+  [D5] VALUE: '金型変更費用'
+  [G5] VALUE: '金型変更期間'
+  [B6] VALUE: '高さ(mm)'
+  [D6] VALUE: 'その他'
+  [B7] VALUE: '箱CBM'
+  [C7] FORMULA: =C4*C5*C6/1000000000  | cached_value: 0
+  [A8] VALUE: 'ﾊﾟﾚｯﾄｻｲｽﾞ'
+  [B8] VALUE: '縦(mm)'
+  [D8] VALUE: '製造依頼数量'
+  [E8] FORMULA: =B15  | cached_value: 0
+  [B9] VALUE: '横(mm)'
+  [D9] VALUE: '製造単価'
+  [B10] VALUE: '高さ(mm)'
+  [C10] VALUE: 120
+  [D10] VALUE: '為替ﾚｰﾄRMB'
+  [E10] VALUE: 23
+  [B11] VALUE: 'ﾊﾟﾚCBM'
+  [C11] FORMULA: =C8*C9*C10/1000000000  | cached_value: 0
+  [D11] VALUE: '現地製造ｺｽﾄ'
+  [E11] FORMULA: =E8*E9*E10  | cached_value: 0
+  [A12] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [D12] VALUE: '輸送ｺｽﾄ'
+  [E12] VALUE: 250000
+  [A13] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B13] FORMULA: =B3*B12  | cached_value: 0
+  [D13] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F13] FORMULA: =E11+E12  | cached_value: 250000
+  [A14] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B14] FORMULA: =C7*B12+C11  | cached_value: 0
+  [D14] VALUE: '輸入関税(4%)'
+  [E14] FORMULA: =F13*0.04  | cached_value: 10000
+  [A15] VALUE: '20ftコンテナ満載数量'
+  [D15] VALUE: '輸入消費税'
+  [E15] VALUE: 0
+  [D16] VALUE: '総コスト'
+  [E16] FORMULA: =F13+E14+E15  | cached_value: 260000
+  [A17] VALUE: '満載数量マイナス5％'
+  [B17] FORMULA: =B15/1.05  | cached_value: 0
+  [D17] VALUE: '利益率別単価'
+  [E17] VALUE: 0.6
+  [F17] FORMULA: =E16*1.6  | cached_value: 416000
+  [G17] FORMULA: =F17/B19  | cached_value: '#DIV/0!'
+  [H17] VALUE: 0.55
+  [I17] FORMULA: =E16*1.55  | cached_value: 403000
+  [J17] FORMULA: =I17/B19  | cached_value: '#DIV/0!'
+  [A18] VALUE: '最適提案ｶｰﾄﾝ数'
+  [B18] FORMULA: =B17/B3  | cached_value: '#DIV/0!'
+  [E18] VALUE: 0.5
+  [F18] FORMULA: =E16*1.5  | cached_value: 390000
+  [G18] FORMULA: =F18/B19  | cached_value: '#DIV/0!'
+  [H18] VALUE: 0.45
+  [I18] FORMULA: =E16*1.45  | cached_value: 377000
+  [J18] FORMULA: =I18/B19  | cached_value: '#DIV/0!'
+  [A19] VALUE: '最適見積数量'
+  [B19] FORMULA: =B3*C18  | cached_value: 0
+  [E19] VALUE: 0.4
+  [F19] FORMULA: =E16*1.4  | cached_value: 364000
+  [G19] FORMULA: =F19/B19  | cached_value: '#DIV/0!'
+  [H19] VALUE: 0.35
+  [I19] FORMULA: =E16*1.35  | cached_value: 351000
+  [J19] FORMULA: =I19/B19  | cached_value: '#DIV/0!'
+  [E20] VALUE: 0.3
+  [F20] FORMULA: =E16*1.3  | cached_value: 338000
+  [G20] FORMULA: =F20/B19  | cached_value: '#DIV/0!'
+  [H20] VALUE: 0.25
+  [I20] FORMULA: =E16*1.25  | cached_value: 325000
+  [J20] FORMULA: =I20/B19  | cached_value: '#DIV/0!'
+
+################################################################################
+  SHEET: "40ft FCL"
+  Dimensions: A1:J20  Max row: 20, Max col: 10
+################################################################################
+
+  MERGED CELLS: ['B3:C3', 'B19:C20', 'B15:C16', 'E5:F5', 'B12:C12', 'E4:F4', 'B2:C2', 'E2:J2', 'D17:D20', 'D13:E13', 'B14:C14', 'B1:F1', 'B17:C17', 'B13:C13', 'A8:A11', 'G5:H5', 'I5:J5', 'F13:G13', 'E3:J3', 'A19:A20', 'E6:J7', 'H1:J1', 'A4:A7', 'G4:H4', 'I4:J4', 'A15:A16', 'D6:D7']
+
+  --- CELL DATA ---
+  [A1] VALUE: 'Customer’s Name'
+  [G1] VALUE: 'Date'
+  [H1] VALUE: '2024.00.00'
+  [A2] VALUE: 'Style'
+  [B2] VALUE: 'ML-'
+  [D2] VALUE: '缶サイズ'
+  [A3] VALUE: '入数/箱'
+  [D3] VALUE: '印刷仕様'
+  [A4] VALUE: '箱サイズ'
+  [B4] VALUE: '縦(mm)'
+  [D4] VALUE: '金型費用'
+  [G4] VALUE: 'エンボス作成期間'
+  [I4] VALUE: '2-3 Weeks'
+  [B5] VALUE: '横(mm)'
+  [D5] VALUE: '金型変更費用'
+  [G5] VALUE: '金型変更期間'
+  [B6] VALUE: '高さ(mm)'
+  [D6] VALUE: 'その他'
+  [B7] VALUE: '箱CBM'
+  [C7] FORMULA: =C4*C5*C6/1000000000  | cached_value: 0
+  [A8] VALUE: 'ﾊﾟﾚｯﾄｻｲｽﾞ'
+  [B8] VALUE: '縦(mm)'
+  [D8] VALUE: '製造依頼数量'
+  [E8] FORMULA: =B15  | cached_value: 0
+  [B9] VALUE: '横(mm)'
+  [D9] VALUE: '製造単価'
+  [B10] VALUE: '高さ(mm)'
+  [C10] VALUE: 120
+  [D10] VALUE: '為替ﾚｰﾄRMB'
+  [E10] VALUE: 21
+  [B11] VALUE: 'ﾊﾟﾚCBM'
+  [C11] FORMULA: =C8*C9*C10/1000000000  | cached_value: 0
+  [D11] VALUE: '現地製造ｺｽﾄ'
+  [E11] FORMULA: =E8*E9*E10  | cached_value: 0
+  [A12] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [D12] VALUE: '輸送ｺｽﾄ'
+  [E12] VALUE: 400000
+  [A13] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B13] FORMULA: =B3*B12  | cached_value: 0
+  [D13] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F13] FORMULA: =E11+E12  | cached_value: 400000
+  [A14] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B14] FORMULA: =C7*B12+C11  | cached_value: 0
+  [D14] VALUE: '輸入関税(4%)'
+  [E14] FORMULA: =F13*0.04  | cached_value: 16000
+  [A15] VALUE: '40ftコンテナ満載数量'
+  [D15] VALUE: '輸入消費税'
+  [E15] VALUE: 0
+  [D16] VALUE: '総コスト'
+  [E16] FORMULA: =F13+E14+E15  | cached_value: 416000
+  [A17] VALUE: '満載数量マイナス5％'
+  [B17] FORMULA: =B15/1.05  | cached_value: 0
+  [D17] VALUE: '利益率別単価'
+  [E17] VALUE: 0.6
+  [F17] FORMULA: =E16*1.6  | cached_value: 665600
+  [G17] FORMULA: =F17/B19  | cached_value: '#DIV/0!'
+  [H17] VALUE: 0.55
+  [I17] FORMULA: =E16*1.55  | cached_value: 644800
+  [J17] FORMULA: =I17/B19  | cached_value: '#DIV/0!'
+  [A18] VALUE: '最適提案ｶｰﾄﾝ数'
+  [B18] FORMULA: =B17/B3  | cached_value: '#DIV/0!'
+  [C18] FORMULA: =ROUNDDOWN(B18, 0)  | cached_value: '#DIV/0!'
+  [E18] VALUE: 0.5
+  [F18] FORMULA: =E16*1.5  | cached_value: 624000
+  [G18] FORMULA: =F18/B19  | cached_value: '#DIV/0!'
+  [H18] VALUE: 0.45
+  [I18] FORMULA: =E16*1.45  | cached_value: 603200
+  [J18] FORMULA: =I18/B19  | cached_value: '#DIV/0!'
+  [A19] VALUE: '最適見積数量'
+  [B19] FORMULA: =B3*C18  | cached_value: '#DIV/0!'
+  [E19] VALUE: 0.4
+  [F19] FORMULA: =E16*1.4  | cached_value: 582400
+  [G19] FORMULA: =F19/B19  | cached_value: '#DIV/0!'
+  [H19] VALUE: 0.35
+  [I19] FORMULA: =E16*1.35  | cached_value: 561600
+  [J19] FORMULA: =I19/B19  | cached_value: '#DIV/0!'
+  [E20] VALUE: 0.3
+  [F20] FORMULA: =E16*1.3  | cached_value: 540800
+  [G20] FORMULA: =F20/B19  | cached_value: '#DIV/0!'
+  [H20] VALUE: 0.25
+  [I20] FORMULA: =E16*1.25  | cached_value: 520000
+  [J20] FORMULA: =I20/B19  | cached_value: '#DIV/0!'
+
+################################################################################
+  SHEET: "フルコン複数"
+  Dimensions: A1:J20  Max row: 20, Max col: 10
+################################################################################
+
+  MERGED CELLS: ['B3:C3', 'B19:C20', 'B15:C16', 'E5:F5', 'B12:C12', 'E4:F4', 'B2:C2', 'E2:J2', 'D17:D20', 'D13:E13', 'B14:C14', 'B1:F1', 'B17:C17', 'B13:C13', 'A8:A11', 'G5:H5', 'I5:J5', 'F13:G13', 'E3:J3', 'A19:A20', 'E6:J7', 'H1:J1', 'A4:A7', 'G4:H4', 'I4:J4', 'A15:A16', 'D6:D7']
+
+  --- CELL DATA ---
+  [A1] VALUE: 'Customer’s Name'
+  [G1] VALUE: 'Date'
+  [H1] VALUE: '2024.00.00'
+  [A2] VALUE: 'Style'
+  [B2] VALUE: 'ML-'
+  [D2] VALUE: '缶サイズ'
+  [A3] VALUE: '入数/箱'
+  [D3] VALUE: '印刷仕様'
+  [A4] VALUE: '箱サイズ'
+  [B4] VALUE: '縦(mm)'
+  [D4] VALUE: '金型費用'
+  [G4] VALUE: 'エンボス作成期間'
+  [I4] VALUE: '2-3 Weeks'
+  [B5] VALUE: '横(mm)'
+  [D5] VALUE: '金型変更費用'
+  [G5] VALUE: '金型変更期間'
+  [B6] VALUE: '高さ(mm)'
+  [D6] VALUE: 'その他'
+  [B7] VALUE: '箱CBM'
+  [C7] FORMULA: =C4*C5*C6/1000000000  | cached_value: 0
+  [A8] VALUE: 'ﾊﾟﾚｯﾄｻｲｽﾞ'
+  [B8] VALUE: '縦(mm)'
+  [D8] VALUE: '製造依頼数量'
+  [E8] FORMULA: =B15  | cached_value: 0
+  [B9] VALUE: '横(mm)'
+  [D9] VALUE: '製造単価'
+  [G9] VALUE: '40ft+20ftの場合：650,000円'
+  [B10] VALUE: '高さ(mm)'
+  [C10] VALUE: 120
+  [D10] VALUE: '為替ﾚｰﾄRMB'
+  [E10] VALUE: 21
+  [G10] VALUE: '40ft x 2本の場合：800,000円'
+  [B11] VALUE: 'ﾊﾟﾚCBM'
+  [C11] FORMULA: =C8*C9*C10/1000000000  | cached_value: 0
+  [D11] VALUE: '現地製造ｺｽﾄ'
+  [E11] FORMULA: =E8*E9*E10  | cached_value: 0
+  [G11] VALUE: '40ft x 3本の場合：1,200,000円\u3000を手入力'
+  [A12] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [D12] VALUE: '輸送ｺｽﾄ'
+  [A13] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B13] FORMULA: =B3*B12  | cached_value: 0
+  [D13] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F13] FORMULA: =E11+E12  | cached_value: 0
+  [A14] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B14] FORMULA: =C7*B12+C11  | cached_value: 0
+  [D14] VALUE: '輸入関税(4%)'
+  [E14] FORMULA: =F13*0.04  | cached_value: 0
+  [A15] VALUE: '該当コンテナ満載数量'
+  [D15] VALUE: '輸入消費税'
+  [E15] FORMULA: =(F13+E14)*0.1  | cached_value: 0
+  [D16] VALUE: '総コスト'
+  [E16] FORMULA: =F13+E14+E15  | cached_value: 0
+  [A17] VALUE: '満載数量マイナス5％'
+  [B17] FORMULA: =B15/1.05  | cached_value: 0
+  [D17] VALUE: '利益率別単価'
+  [E17] VALUE: 0.6
+  [F17] FORMULA: =E16*1.6  | cached_value: 0
+  [G17] FORMULA: =F17/B19  | cached_value: '#DIV/0!'
+  [H17] VALUE: 0.55
+  [I17] FORMULA: =E16*1.55  | cached_value: 0
+  [J17] FORMULA: =I17/B19  | cached_value: '#DIV/0!'
+  [A18] VALUE: '最適提案ｶｰﾄﾝ数'
+  [B18] FORMULA: =B17/B3  | cached_value: '#DIV/0!'
+  [C18] FORMULA: =ROUNDDOWN(B18, 0)  | cached_value: '#DIV/0!'
+  [E18] VALUE: 0.5
+  [F18] FORMULA: =E16*1.5  | cached_value: 0
+  [G18] FORMULA: =F18/B19  | cached_value: '#DIV/0!'
+  [H18] VALUE: 0.45
+  [I18] FORMULA: =E16*1.45  | cached_value: 0
+  [J18] FORMULA: =I18/B19  | cached_value: '#DIV/0!'
+  [A19] VALUE: '最適見積数量'
+  [B19] FORMULA: =B3*C18  | cached_value: '#DIV/0!'
+  [E19] VALUE: 0.4
+  [F19] FORMULA: =E16*1.4  | cached_value: 0
+  [G19] FORMULA: =F19/B19  | cached_value: '#DIV/0!'
+  [H19] VALUE: 0.35
+  [I19] FORMULA: =E16*1.35  | cached_value: 0
+  [J19] FORMULA: =I19/B19  | cached_value: '#DIV/0!'
+  [E20] VALUE: 0.3
+  [F20] FORMULA: =E16*1.3  | cached_value: 0
+  [G20] FORMULA: =F20/B19  | cached_value: '#DIV/0!'
+  [H20] VALUE: 0.25
+  [I20] FORMULA: =E16*1.25  | cached_value: 0
+  [J20] FORMULA: =I20/B19  | cached_value: '#DIV/0!'
+
+====================================================================================================
+  FILE 2: 【新】見積算出フォーマット (blank template)
+  Path: C:/Users/wilfr/OneDrive/AI/Japan/Forms/【新】見積算出フォーマット.xlsx
+====================================================================================================
+
+SHEET NAMES: ['発注数量別単価計算表', '20ft FCL', '40ft FCL', 'フルコン複数']
+
+
+################################################################################
+  SHEET: "発注数量別単価計算表"
+  Dimensions: A1:J69  Max row: 69, Max col: 10
+################################################################################
+
+  MERGED CELLS: ['D50:D53', 'B62:C62', 'B3:C3', 'D34:D37', 'B15:C16', 'E5:F5', 'B46:C46', 'D46:E46', 'B12:C12', 'E4:F4', 'B2:C2', 'F30:G30', 'A24:C27', 'E2:J2', 'A40:C43', 'B67:C67', 'B61:C61', 'B60:C60', 'B14:C14', 'B1:F1', 'B17:C17', 'B63:C64', 'B13:C13', 'D66:D69', 'B44:C44', 'F62:G62', 'D18:D21', 'B29:C29', 'A8:A11', 'B19:C19', 'B28:C28', 'G5:H5', 'B31:C32', 'F46:G46', 'I5:J5', 'D62:E62', 'A47:A48', 'A63:A64', 'A56:C59', 'E3:J3', 'B49:C49', 'B65:C65', 'E6:J7', 'B47:C48', 'H1:J1', 'A4:A7', 'G4:H4', 'B30:C30', 'I4:J4', 'D30:E30', 'B33:C33', 'B51:C51', 'B45:C45', 'A15:A16', 'D14:E14', 'F14:G14', 'A31:A32', 'D6:D7', 'B35:C35']
+
+  --- CELL DATA ---
+  [A1] VALUE: 'Customer’s Name'
+  [G1] VALUE: 'Date'
+  [A2] VALUE: 'Style'
+  [D2] VALUE: '缶サイズ'
+  [A3] VALUE: '入数/箱'
+  [D3] VALUE: '印刷仕様'
+  [A4] VALUE: '箱サイズ'
+  [B4] VALUE: '縦(mm)'
+  [D4] VALUE: '金型費用'
+  [G4] VALUE: 'エンボス作成期間'
+  [B5] VALUE: '横(mm)'
+  [D5] VALUE: '金型変更費用'
+  [G5] VALUE: '金型変更期間'
+  [B6] VALUE: '高さ(mm)'
+  [D6] VALUE: 'その他'
+  [B7] VALUE: '箱CBM'
+  [C7] FORMULA: =C4*C5*C6/1000000000  | cached_value: 0
+  [A8] VALUE: 'ﾊﾟﾚｯﾄｻｲｽﾞ'
+  [B8] VALUE: '縦(mm)'
+  [D8] VALUE: '顧客発注数'
+  [E8] FORMULA: =B15  | cached_value: 0
+  [B9] VALUE: '横(mm)'
+  [D9] VALUE: '製造単価'
+  [G9] VALUE: '20ftフルコン以下の場合、輸送コストのMAXは'
+  [B10] VALUE: '高さ(mm)'
+  [C10] VALUE: 120
+  [D10] VALUE: '工場製造数量'
+  [E10] FORMULA: =B19  | cached_value: '#DIV/0!'
+  [G10] VALUE: '250,000円につき、それ以上の場合には250,000円'
+  [B11] VALUE: 'ﾊﾟﾚCBM'
+  [C11] FORMULA: =C8*C9*C10/1000000000  | cached_value: 0
+  [D11] VALUE: '為替ﾚｰﾄRMB'
+  [E11] VALUE: 23
+  [G11] VALUE: 'で手入力する'
+  [A12] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [D12] VALUE: '現地製造ｺｽﾄ'
+  [E12] FORMULA: =E10*E9*E11  | cached_value: '#DIV/0!'
+  [A13] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B13] FORMULA: =B3*B12  | cached_value: 0
+  [D13] VALUE: '輸送ｺｽﾄLCL'
+  [E13] FORMULA: =C21*23000+10000  | cached_value: '#DIV/0!'
+  [F13] VALUE: '輸送ｺｽﾄ20ft'
+  [G13] VALUE: 250000
+  [H13] VALUE: '輸送ｺｽﾄ40ft'
+  [I13] VALUE: 400000
+  [J13] VALUE: '←選択'
+  [A14] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B14] FORMULA: =C7*B12+C11  | cached_value: 0
+  [D14] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F14] FORMULA: =E12+E13  | cached_value: '#DIV/0!'
+  [A15] VALUE: '顧客発注数'
+  [D15] VALUE: '輸入関税(4%)'
+  [E15] FORMULA: =F14*0.04  | cached_value: '#DIV/0!'
+  [D16] VALUE: '輸入消費税'
+  [E16] VALUE: 0
+  [A17] VALUE: '顧客発注数＋５％'
+  [B17] FORMULA: =B15*1.05  | cached_value: 0
+  [D17] VALUE: '総コスト'
+  [E17] FORMULA: =F14+E15+E16  | cached_value: '#DIV/0!'
+  [A18] VALUE: '製造依頼ｶｰﾄﾝ数'
+  [B18] FORMULA: =B17/B3  | cached_value: '#DIV/0!'
+  [C18] FORMULA: =ROUNDDOWN(B18, 0)  | cached_value: '#DIV/0!'
+  [D18] VALUE: '利益率別単価'
+  [E18] VALUE: 0.6
+  [F18] FORMULA: =E17*1.6  | cached_value: '#DIV/0!'
+  [G18] FORMULA: =F18/E8  | cached_value: '#DIV/0!'
+  [H18] VALUE: 0.55
+  [I18] FORMULA: =E17*1.55  | cached_value: '#DIV/0!'
+  [J18] FORMULA: =I18/E8  | cached_value: '#DIV/0!'
+  [A19] VALUE: '工場製造数量'
+  [B19] FORMULA: =B3*C18  | cached_value: '#DIV/0!'
+  [E19] VALUE: 0.5
+  [F19] FORMULA: =E17*1.5  | cached_value: '#DIV/0!'
+  [G19] FORMULA: =F19/E8  | cached_value: '#DIV/0!'
+  [H19] VALUE: 0.45
+  [I19] FORMULA: =E17*1.45  | cached_value: '#DIV/0!'
+  [J19] FORMULA: =I19/E8  | cached_value: '#DIV/0!'
+  [A20] VALUE: 'ﾊﾟﾚｯﾄ数'
+  [B20] FORMULA: =C18/B12  | cached_value: '#DIV/0!'
+  [C20] FORMULA: =ROUNDUP(B20, 0)  | cached_value: '#DIV/0!'
+  [E20] VALUE: 0.4
+  [F20] FORMULA: =E17*1.4  | cached_value: '#DIV/0!'
+  [G20] FORMULA: =F20/E8  | cached_value: '#DIV/0!'
+  [H20] VALUE: 0.35
+  [I20] FORMULA: =E17*1.35  | cached_value: '#DIV/0!'
+  [J20] FORMULA: =I20/E8  | cached_value: '#DIV/0!'
+  [A21] VALUE: '輸送サイズ'
+  [B21] FORMULA: =B14*C20  | cached_value: '#DIV/0!'
+  [C21] FORMULA: =ROUNDUP(B21, 0)  | cached_value: '#DIV/0!'
+  [E21] VALUE: 0.3
+  [F21] FORMULA: =E17*1.3  | cached_value: '#DIV/0!'
+  [G21] FORMULA: =F21/E8  | cached_value: '#DIV/0!'
+  [H21] VALUE: 0.25
+  [I21] FORMULA: =E17*1.25  | cached_value: '#DIV/0!'
+  [J21] FORMULA: =I21/E8  | cached_value: '#DIV/0!'
+  [A24] VALUE: '同条件・ロット違いの場合'
+  [D24] VALUE: '顧客発注数'
+  [E24] FORMULA: =B31  | cached_value: 0
+  [D25] VALUE: '製造単価'
+  [D26] VALUE: '工場製造数量'
+  [E26] FORMULA: =B35  | cached_value: 0
+  [D27] VALUE: '為替ﾚｰﾄRMB'
+  [E27] VALUE: 23
+  [A28] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [B28] FORMULA: =B12  | cached_value: 0
+  [D28] VALUE: '現地製造ｺｽﾄ'
+  [E28] FORMULA: =E26*E25*E27  | cached_value: 0
+  [A29] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B29] FORMULA: =B13  | cached_value: 0
+  [D29] VALUE: '輸送ｺｽﾄLCL'
+  [E29] FORMULA: =C37*23000+10000  | cached_value: '#DIV/0!'
+  [F29] VALUE: '輸送ｺｽﾄ20ft'
+  [G29] VALUE: 250000
+  [H29] VALUE: '輸送ｺｽﾄ40ft'
+  [I29] VALUE: 400000
+  [J29] VALUE: '←選択'
+  [A30] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B30] FORMULA: =B14  | cached_value: 0
+  [D30] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F30] FORMULA: =E28+E29  | cached_value: '#DIV/0!'
+  [A31] VALUE: '顧客発注数'
+  [D31] VALUE: '輸入関税(4%)'
+  [E31] FORMULA: =F30*0.04  | cached_value: '#DIV/0!'
+  [D32] VALUE: '輸入消費税'
+  [E32] VALUE: 0
+  [A33] VALUE: '顧客発注数＋５％'
+  [B33] FORMULA: =B31*1.05  | cached_value: 0
+  [D33] VALUE: '総コスト'
+  [E33] FORMULA: =F30+E31+E32  | cached_value: '#DIV/0!'
+  [A34] VALUE: '製造依頼ｶｰﾄﾝ数'
+  [B34] FORMULA: =B33/B3  | cached_value: '#DIV/0!'
+  [D34] VALUE: '利益率別単価'
+  [E34] VALUE: 0.6
+  [F34] FORMULA: =E33*1.6  | cached_value: '#DIV/0!'
+  [G34] FORMULA: =F34/E24  | cached_value: '#DIV/0!'
+  [H34] VALUE: 0.55
+  [I34] FORMULA: =E33*1.55  | cached_value: '#DIV/0!'
+  [J34] FORMULA: =I34/E24  | cached_value: '#DIV/0!'
+  [A35] VALUE: '工場製造数量'
+  [B35] FORMULA: =B3*C34  | cached_value: 0
+  [E35] VALUE: 0.5
+  [F35] FORMULA: =E33*1.5  | cached_value: '#DIV/0!'
+  [G35] FORMULA: =F35/E24  | cached_value: '#DIV/0!'
+  [H35] VALUE: 0.45
+  [I35] FORMULA: =E33*1.45  | cached_value: '#DIV/0!'
+  [J35] FORMULA: =I35/E24  | cached_value: '#DIV/0!'
+  [A36] VALUE: 'ﾊﾟﾚｯﾄ数'
+  [B36] FORMULA: =C34/B12  | cached_value: '#DIV/0!'
+  [C36] FORMULA: =ROUNDUP(B36, 0)  | cached_value: '#DIV/0!'
+  [E36] VALUE: 0.4
+  [F36] FORMULA: =E33*1.4  | cached_value: '#DIV/0!'
+  [G36] FORMULA: =F36/E24  | cached_value: '#DIV/0!'
+  [H36] VALUE: 0.35
+  [I36] FORMULA: =E33*1.35  | cached_value: '#DIV/0!'
+  [J36] FORMULA: =I36/E24  | cached_value: '#DIV/0!'
+  [A37] VALUE: '輸送サイズ'
+  [B37] FORMULA: =B30*C36  | cached_value: '#DIV/0!'
+  [C37] FORMULA: =ROUNDUP(B37, 0)  | cached_value: '#DIV/0!'
+  [E37] VALUE: 0.3
+  [F37] FORMULA: =E33*1.3  | cached_value: '#DIV/0!'
+  [G37] FORMULA: =F37/E24  | cached_value: '#DIV/0!'
+  [H37] VALUE: 0.25
+  [I37] FORMULA: =E33*1.25  | cached_value: '#DIV/0!'
+  [J37] FORMULA: =I37/E24  | cached_value: '#DIV/0!'
+  [A40] VALUE: '同条件・ロット違いの場合'
+  [D40] VALUE: '顧客発注数'
+  [E40] FORMULA: =B47  | cached_value: 0
+  [D41] VALUE: '製造単価'
+  [D42] VALUE: '工場製造数量'
+  [E42] FORMULA: =B51  | cached_value: '#DIV/0!'
+  [D43] VALUE: '為替ﾚｰﾄRMB'
+  [E43] VALUE: 23
+  [A44] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [B44] FORMULA: =B12  | cached_value: 0
+  [D44] VALUE: '現地製造ｺｽﾄ'
+  [E44] FORMULA: =E42*E41*E43  | cached_value: '#DIV/0!'
+  [A45] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B45] FORMULA: =B13  | cached_value: 0
+  [D45] VALUE: '輸送ｺｽﾄLCL'
+  [E45] FORMULA: =C53*23000+10000  | cached_value: '#DIV/0!'
+  [F45] VALUE: '輸送ｺｽﾄ20ft'
+  [G45] VALUE: 250000
+  [H45] VALUE: '輸送ｺｽﾄ40ft'
+  [I45] VALUE: 400000
+  [J45] VALUE: '←選択'
+  [A46] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B46] FORMULA: =B14  | cached_value: 0
+  [D46] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F46] FORMULA: =E44+E45  | cached_value: '#DIV/0!'
+  [A47] VALUE: '顧客発注数'
+  [D47] VALUE: '輸入関税(4%)'
+  [E47] FORMULA: =F46*0.04  | cached_value: '#DIV/0!'
+  [D48] VALUE: '輸入消費税'
+  [E48] VALUE: 0
+  [A49] VALUE: '顧客発注数＋５％'
+  [B49] FORMULA: =B47*1.05  | cached_value: 0
+  [D49] VALUE: '総コスト'
+  [E49] FORMULA: =F46+E47+E48  | cached_value: '#DIV/0!'
+  [A50] VALUE: '製造依頼ｶｰﾄﾝ数'
+  [B50] FORMULA: =B49/B3  | cached_value: '#DIV/0!'
+  [C50] FORMULA: =ROUNDDOWN(B50, 0)  | cached_value: '#DIV/0!'
+  [D50] VALUE: '利益率別単価'
+  [E50] VALUE: 0.6
+  [F50] FORMULA: =E49*1.6  | cached_value: '#DIV/0!'
+  [G50] FORMULA: =F50/E40  | cached_value: '#DIV/0!'
+  [H50] VALUE: 0.55
+  [I50] FORMULA: =E49*1.55  | cached_value: '#DIV/0!'
+  [J50] FORMULA: =I50/E40  | cached_value: '#DIV/0!'
+  [A51] VALUE: '工場製造数量'
+  [B51] FORMULA: =B3*C50  | cached_value: '#DIV/0!'
+  [E51] VALUE: 0.5
+  [F51] FORMULA: =E49*1.5  | cached_value: '#DIV/0!'
+  [G51] FORMULA: =F51/E40  | cached_value: '#DIV/0!'
+  [H51] VALUE: 0.45
+  [I51] FORMULA: =E49*1.45  | cached_value: '#DIV/0!'
+  [J51] FORMULA: =I51/E40  | cached_value: '#DIV/0!'
+  [A52] VALUE: 'ﾊﾟﾚｯﾄ数'
+  [B52] FORMULA: =C50/B12  | cached_value: '#DIV/0!'
+  [C52] FORMULA: =ROUNDUP(B52, 0)  | cached_value: '#DIV/0!'
+  [E52] VALUE: 0.4
+  [F52] FORMULA: =E49*1.4  | cached_value: '#DIV/0!'
+  [G52] FORMULA: =F52/E40  | cached_value: '#DIV/0!'
+  [H52] VALUE: 0.35
+  [I52] FORMULA: =E49*1.35  | cached_value: '#DIV/0!'
+  [J52] FORMULA: =I52/E40  | cached_value: '#DIV/0!'
+  [A53] VALUE: '輸送サイズ'
+  [B53] FORMULA: =B46*C52  | cached_value: '#DIV/0!'
+  [C53] FORMULA: =ROUNDUP(B53, 0)  | cached_value: '#DIV/0!'
+  [E53] VALUE: 0.3
+  [F53] FORMULA: =E49*1.3  | cached_value: '#DIV/0!'
+  [G53] FORMULA: =F53/E40  | cached_value: '#DIV/0!'
+  [H53] VALUE: 0.25
+  [I53] FORMULA: =E49*1.25  | cached_value: '#DIV/0!'
+  [J53] FORMULA: =I53/E40  | cached_value: '#DIV/0!'
+  [A56] VALUE: '同条件・ロット違いの場合'
+  [D56] VALUE: '顧客発注数'
+  [E56] FORMULA: =B63  | cached_value: 0
+  [D57] VALUE: '製造単価'
+  [D58] VALUE: '工場製造数量'
+  [E58] FORMULA: =B67  | cached_value: '#DIV/0!'
+  [D59] VALUE: '為替ﾚｰﾄRMB'
+  [E59] VALUE: 23
+  [A60] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [B60] FORMULA: =B28  | cached_value: 0
+  [D60] VALUE: '現地製造ｺｽﾄ'
+  [E60] FORMULA: =E58*E57*E59  | cached_value: '#DIV/0!'
+  [A61] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B61] FORMULA: =B29  | cached_value: 0
+  [D61] VALUE: '輸送ｺｽﾄLCL'
+  [E61] FORMULA: =C69*23000+10000  | cached_value: '#DIV/0!'
+  [F61] VALUE: '輸送ｺｽﾄ20ft'
+  [G61] VALUE: 250000
+  [H61] VALUE: '輸送ｺｽﾄ40ft'
+  [I61] VALUE: 400000
+  [J61] VALUE: '←選択'
+  [A62] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B62] FORMULA: =B30  | cached_value: 0
+  [D62] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F62] FORMULA: =E60+E61  | cached_value: '#DIV/0!'
+  [A63] VALUE: '顧客発注数'
+  [D63] VALUE: '輸入関税(4%)'
+  [E63] FORMULA: =F62*0.04  | cached_value: '#DIV/0!'
+  [D64] VALUE: '輸入消費税'
+  [E64] VALUE: 0
+  [A65] VALUE: '顧客発注数＋５％'
+  [B65] FORMULA: =B63*1.05  | cached_value: 0
+  [D65] VALUE: '総コスト'
+  [E65] FORMULA: =F62+E63+E64  | cached_value: '#DIV/0!'
+  [A66] VALUE: '製造依頼ｶｰﾄﾝ数'
+  [B66] FORMULA: =B65/B3  | cached_value: '#DIV/0!'
+  [C66] FORMULA: =ROUNDDOWN(B66, 0)  | cached_value: '#DIV/0!'
+  [D66] VALUE: '利益率別単価'
+  [E66] VALUE: 0.6
+  [F66] FORMULA: =E65*1.6  | cached_value: '#DIV/0!'
+  [G66] FORMULA: =F66/E56  | cached_value: '#DIV/0!'
+  [H66] VALUE: 0.55
+  [I66] FORMULA: =E65*1.55  | cached_value: '#DIV/0!'
+  [J66] FORMULA: =I66/E56  | cached_value: '#DIV/0!'
+  [A67] VALUE: '工場製造数量'
+  [B67] FORMULA: =B3*C66  | cached_value: '#DIV/0!'
+  [E67] VALUE: 0.5
+  [F67] FORMULA: =E65*1.5  | cached_value: '#DIV/0!'
+  [G67] FORMULA: =F67/E56  | cached_value: '#DIV/0!'
+  [H67] VALUE: 0.45
+  [I67] FORMULA: =E65*1.45  | cached_value: '#DIV/0!'
+  [J67] FORMULA: =I67/E56  | cached_value: '#DIV/0!'
+  [A68] VALUE: 'ﾊﾟﾚｯﾄ数'
+  [B68] FORMULA: =C66/B28  | cached_value: '#DIV/0!'
+  [C68] FORMULA: =ROUNDUP(B68, 0)  | cached_value: '#DIV/0!'
+  [E68] VALUE: 0.4
+  [F68] FORMULA: =E65*1.4  | cached_value: '#DIV/0!'
+  [G68] FORMULA: =F68/E56  | cached_value: '#DIV/0!'
+  [H68] VALUE: 0.35
+  [I68] FORMULA: =E65*1.35  | cached_value: '#DIV/0!'
+  [J68] FORMULA: =I68/E56  | cached_value: '#DIV/0!'
+  [A69] VALUE: '輸送サイズ'
+  [B69] FORMULA: =B62*C68  | cached_value: '#DIV/0!'
+  [C69] FORMULA: =ROUNDUP(B69, 0)  | cached_value: '#DIV/0!'
+  [E69] VALUE: 0.3
+  [F69] FORMULA: =E65*1.3  | cached_value: '#DIV/0!'
+  [G69] FORMULA: =F69/E56  | cached_value: '#DIV/0!'
+  [H69] VALUE: 0.25
+  [I69] FORMULA: =E65*1.25  | cached_value: '#DIV/0!'
+  [J69] FORMULA: =I69/E56  | cached_value: '#DIV/0!'
+
+################################################################################
+  SHEET: "20ft FCL"
+  Dimensions: A1:J20  Max row: 20, Max col: 10
+################################################################################
+
+  MERGED CELLS: ['B3:C3', 'B19:C20', 'B15:C16', 'E5:F5', 'B12:C12', 'E4:F4', 'B2:C2', 'E2:J2', 'D17:D20', 'D13:E13', 'B14:C14', 'B1:F1', 'B17:C17', 'B13:C13', 'A8:A11', 'G5:H5', 'I5:J5', 'F13:G13', 'E3:J3', 'A19:A20', 'E6:J7', 'H1:J1', 'A4:A7', 'G4:H4', 'I4:J4', 'A15:A16', 'D6:D7']
+
+  --- CELL DATA ---
+  [A1] VALUE: 'Customer’s Name'
+  [G1] VALUE: 'Date'
+  [H1] VALUE: '2024.00.00'
+  [A2] VALUE: 'Style'
+  [B2] VALUE: 'ML-'
+  [D2] VALUE: '缶サイズ'
+  [A3] VALUE: '入数/箱'
+  [D3] VALUE: '印刷仕様'
+  [A4] VALUE: '箱サイズ'
+  [B4] VALUE: '縦(mm)'
+  [D4] VALUE: '金型費用'
+  [G4] VALUE: 'エンボス作成期間'
+  [I4] VALUE: '2-3 Weeks'
+  [B5] VALUE: '横(mm)'
+  [D5] VALUE: '金型変更費用'
+  [G5] VALUE: '金型変更期間'
+  [B6] VALUE: '高さ(mm)'
+  [D6] VALUE: 'その他'
+  [B7] VALUE: '箱CBM'
+  [C7] FORMULA: =C4*C5*C6/1000000000  | cached_value: 0
+  [A8] VALUE: 'ﾊﾟﾚｯﾄｻｲｽﾞ'
+  [B8] VALUE: '縦(mm)'
+  [D8] VALUE: '製造依頼数量'
+  [E8] FORMULA: =B15  | cached_value: 0
+  [B9] VALUE: '横(mm)'
+  [D9] VALUE: '製造単価'
+  [B10] VALUE: '高さ(mm)'
+  [C10] VALUE: 120
+  [D10] VALUE: '為替ﾚｰﾄRMB'
+  [E10] VALUE: 23
+  [B11] VALUE: 'ﾊﾟﾚCBM'
+  [C11] FORMULA: =C8*C9*C10/1000000000  | cached_value: 0
+  [D11] VALUE: '現地製造ｺｽﾄ'
+  [E11] FORMULA: =E8*E9*E10  | cached_value: 0
+  [A12] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [D12] VALUE: '輸送ｺｽﾄ'
+  [E12] VALUE: 250000
+  [A13] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B13] FORMULA: =B3*B12  | cached_value: 0
+  [D13] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F13] FORMULA: =E11+E12  | cached_value: 250000
+  [A14] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B14] FORMULA: =C7*B12+C11  | cached_value: 0
+  [D14] VALUE: '輸入関税(4%)'
+  [E14] FORMULA: =F13*0.04  | cached_value: 10000
+  [A15] VALUE: '20ftコンテナ満載数量'
+  [D15] VALUE: '輸入消費税'
+  [E15] VALUE: 0
+  [D16] VALUE: '総コスト'
+  [E16] FORMULA: =F13+E14+E15  | cached_value: 260000
+  [A17] VALUE: '満載数量マイナス5％'
+  [B17] FORMULA: =B15/1.05  | cached_value: 0
+  [D17] VALUE: '利益率別単価'
+  [E17] VALUE: 0.6
+  [F17] FORMULA: =E16*1.6  | cached_value: 416000
+  [G17] FORMULA: =F17/B19  | cached_value: '#DIV/0!'
+  [H17] VALUE: 0.55
+  [I17] FORMULA: =E16*1.55  | cached_value: 403000
+  [J17] FORMULA: =I17/B19  | cached_value: '#DIV/0!'
+  [A18] VALUE: '最適提案ｶｰﾄﾝ数'
+  [B18] FORMULA: =B17/B3  | cached_value: '#DIV/0!'
+  [E18] VALUE: 0.5
+  [F18] FORMULA: =E16*1.5  | cached_value: 390000
+  [G18] FORMULA: =F18/B19  | cached_value: '#DIV/0!'
+  [H18] VALUE: 0.45
+  [I18] FORMULA: =E16*1.45  | cached_value: 377000
+  [J18] FORMULA: =I18/B19  | cached_value: '#DIV/0!'
+  [A19] VALUE: '最適見積数量'
+  [B19] FORMULA: =B3*C18  | cached_value: 0
+  [E19] VALUE: 0.4
+  [F19] FORMULA: =E16*1.4  | cached_value: 364000
+  [G19] FORMULA: =F19/B19  | cached_value: '#DIV/0!'
+  [H19] VALUE: 0.35
+  [I19] FORMULA: =E16*1.35  | cached_value: 351000
+  [J19] FORMULA: =I19/B19  | cached_value: '#DIV/0!'
+  [E20] VALUE: 0.3
+  [F20] FORMULA: =E16*1.3  | cached_value: 338000
+  [G20] FORMULA: =F20/B19  | cached_value: '#DIV/0!'
+  [H20] VALUE: 0.25
+  [I20] FORMULA: =E16*1.25  | cached_value: 325000
+  [J20] FORMULA: =I20/B19  | cached_value: '#DIV/0!'
+
+################################################################################
+  SHEET: "40ft FCL"
+  Dimensions: A1:J20  Max row: 20, Max col: 10
+################################################################################
+
+  MERGED CELLS: ['B3:C3', 'B19:C20', 'B15:C16', 'E5:F5', 'B12:C12', 'E4:F4', 'B2:C2', 'E2:J2', 'D17:D20', 'D13:E13', 'B14:C14', 'B1:F1', 'B17:C17', 'B13:C13', 'A8:A11', 'G5:H5', 'I5:J5', 'F13:G13', 'E3:J3', 'A19:A20', 'E6:J7', 'H1:J1', 'A4:A7', 'G4:H4', 'I4:J4', 'A15:A16', 'D6:D7']
+
+  --- CELL DATA ---
+  [A1] VALUE: 'Customer’s Name'
+  [G1] VALUE: 'Date'
+  [H1] VALUE: '2024.00.00'
+  [A2] VALUE: 'Style'
+  [B2] VALUE: 'ML-'
+  [D2] VALUE: '缶サイズ'
+  [A3] VALUE: '入数/箱'
+  [D3] VALUE: '印刷仕様'
+  [A4] VALUE: '箱サイズ'
+  [B4] VALUE: '縦(mm)'
+  [D4] VALUE: '金型費用'
+  [G4] VALUE: 'エンボス作成期間'
+  [I4] VALUE: '2-3 Weeks'
+  [B5] VALUE: '横(mm)'
+  [D5] VALUE: '金型変更費用'
+  [G5] VALUE: '金型変更期間'
+  [B6] VALUE: '高さ(mm)'
+  [D6] VALUE: 'その他'
+  [B7] VALUE: '箱CBM'
+  [C7] FORMULA: =C4*C5*C6/1000000000  | cached_value: 0
+  [A8] VALUE: 'ﾊﾟﾚｯﾄｻｲｽﾞ'
+  [B8] VALUE: '縦(mm)'
+  [D8] VALUE: '製造依頼数量'
+  [E8] FORMULA: =B15  | cached_value: 0
+  [B9] VALUE: '横(mm)'
+  [D9] VALUE: '製造単価'
+  [B10] VALUE: '高さ(mm)'
+  [C10] VALUE: 120
+  [D10] VALUE: '為替ﾚｰﾄRMB'
+  [E10] VALUE: 21
+  [B11] VALUE: 'ﾊﾟﾚCBM'
+  [C11] FORMULA: =C8*C9*C10/1000000000  | cached_value: 0
+  [D11] VALUE: '現地製造ｺｽﾄ'
+  [E11] FORMULA: =E8*E9*E10  | cached_value: 0
+  [A12] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [D12] VALUE: '輸送ｺｽﾄ'
+  [E12] VALUE: 400000
+  [A13] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B13] FORMULA: =B3*B12  | cached_value: 0
+  [D13] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F13] FORMULA: =E11+E12  | cached_value: 400000
+  [A14] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B14] FORMULA: =C7*B12+C11  | cached_value: 0
+  [D14] VALUE: '輸入関税(4%)'
+  [E14] FORMULA: =F13*0.04  | cached_value: 16000
+  [A15] VALUE: '40ftコンテナ満載数量'
+  [D15] VALUE: '輸入消費税'
+  [E15] VALUE: 0
+  [D16] VALUE: '総コスト'
+  [E16] FORMULA: =F13+E14+E15  | cached_value: 416000
+  [A17] VALUE: '満載数量マイナス5％'
+  [B17] FORMULA: =B15/1.05  | cached_value: 0
+  [D17] VALUE: '利益率別単価'
+  [E17] VALUE: 0.6
+  [F17] FORMULA: =E16*1.6  | cached_value: 665600
+  [G17] FORMULA: =F17/B19  | cached_value: '#DIV/0!'
+  [H17] VALUE: 0.55
+  [I17] FORMULA: =E16*1.55  | cached_value: 644800
+  [J17] FORMULA: =I17/B19  | cached_value: '#DIV/0!'
+  [A18] VALUE: '最適提案ｶｰﾄﾝ数'
+  [B18] FORMULA: =B17/B3  | cached_value: '#DIV/0!'
+  [C18] FORMULA: =ROUNDDOWN(B18, 0)  | cached_value: '#DIV/0!'
+  [E18] VALUE: 0.5
+  [F18] FORMULA: =E16*1.5  | cached_value: 624000
+  [G18] FORMULA: =F18/B19  | cached_value: '#DIV/0!'
+  [H18] VALUE: 0.45
+  [I18] FORMULA: =E16*1.45  | cached_value: 603200
+  [J18] FORMULA: =I18/B19  | cached_value: '#DIV/0!'
+  [A19] VALUE: '最適見積数量'
+  [B19] FORMULA: =B3*C18  | cached_value: '#DIV/0!'
+  [E19] VALUE: 0.4
+  [F19] FORMULA: =E16*1.4  | cached_value: 582400
+  [G19] FORMULA: =F19/B19  | cached_value: '#DIV/0!'
+  [H19] VALUE: 0.35
+  [I19] FORMULA: =E16*1.35  | cached_value: 561600
+  [J19] FORMULA: =I19/B19  | cached_value: '#DIV/0!'
+  [E20] VALUE: 0.3
+  [F20] FORMULA: =E16*1.3  | cached_value: 540800
+  [G20] FORMULA: =F20/B19  | cached_value: '#DIV/0!'
+  [H20] VALUE: 0.25
+  [I20] FORMULA: =E16*1.25  | cached_value: 520000
+  [J20] FORMULA: =I20/B19  | cached_value: '#DIV/0!'
+
+################################################################################
+  SHEET: "フルコン複数"
+  Dimensions: A1:J20  Max row: 20, Max col: 10
+################################################################################
+
+  MERGED CELLS: ['B3:C3', 'B19:C20', 'B15:C16', 'E5:F5', 'B12:C12', 'E4:F4', 'B2:C2', 'E2:J2', 'D17:D20', 'D13:E13', 'B14:C14', 'B1:F1', 'B17:C17', 'B13:C13', 'A8:A11', 'G5:H5', 'I5:J5', 'F13:G13', 'E3:J3', 'A19:A20', 'E6:J7', 'H1:J1', 'A4:A7', 'G4:H4', 'I4:J4', 'A15:A16', 'D6:D7']
+
+  --- CELL DATA ---
+  [A1] VALUE: 'Customer’s Name'
+  [G1] VALUE: 'Date'
+  [H1] VALUE: '2024.00.00'
+  [A2] VALUE: 'Style'
+  [B2] VALUE: 'ML-'
+  [D2] VALUE: '缶サイズ'
+  [A3] VALUE: '入数/箱'
+  [D3] VALUE: '印刷仕様'
+  [A4] VALUE: '箱サイズ'
+  [B4] VALUE: '縦(mm)'
+  [D4] VALUE: '金型費用'
+  [G4] VALUE: 'エンボス作成期間'
+  [I4] VALUE: '2-3 Weeks'
+  [B5] VALUE: '横(mm)'
+  [D5] VALUE: '金型変更費用'
+  [G5] VALUE: '金型変更期間'
+  [B6] VALUE: '高さ(mm)'
+  [D6] VALUE: 'その他'
+  [B7] VALUE: '箱CBM'
+  [C7] FORMULA: =C4*C5*C6/1000000000  | cached_value: 0
+  [A8] VALUE: 'ﾊﾟﾚｯﾄｻｲｽﾞ'
+  [B8] VALUE: '縦(mm)'
+  [D8] VALUE: '製造依頼数量'
+  [E8] FORMULA: =B15  | cached_value: 0
+  [B9] VALUE: '横(mm)'
+  [D9] VALUE: '製造単価'
+  [G9] VALUE: '40ft+20ftの場合：650,000円'
+  [B10] VALUE: '高さ(mm)'
+  [C10] VALUE: 120
+  [D10] VALUE: '為替ﾚｰﾄRMB'
+  [E10] VALUE: 21
+  [G10] VALUE: '40ft x 2本の場合：800,000円'
+  [B11] VALUE: 'ﾊﾟﾚCBM'
+  [C11] FORMULA: =C8*C9*C10/1000000000  | cached_value: 0
+  [D11] VALUE: '現地製造ｺｽﾄ'
+  [E11] FORMULA: =E8*E9*E10  | cached_value: 0
+  [G11] VALUE: '40ft x 3本の場合：1,200,000円\u3000を手入力'
+  [A12] VALUE: '箱/ﾊﾟﾚｯﾄ'
+  [D12] VALUE: '輸送ｺｽﾄ'
+  [A13] VALUE: '缶数/ﾊﾟﾚｯﾄ'
+  [B13] FORMULA: =B3*B12  | cached_value: 0
+  [D13] VALUE: '製造ｺｽﾄ＋輸送ｺｽﾄ'
+  [F13] FORMULA: =E11+E12  | cached_value: 0
+  [A14] VALUE: 'ﾊﾟﾚｯﾄCBM'
+  [B14] FORMULA: =C7*B12+C11  | cached_value: 0
+  [D14] VALUE: '輸入関税(4%)'
+  [E14] FORMULA: =F13*0.04  | cached_value: 0
+  [A15] VALUE: '該当コンテナ満載数量'
+  [D15] VALUE: '輸入消費税'
+  [E15] FORMULA: =(F13+E14)*0.1  | cached_value: 0
+  [D16] VALUE: '総コスト'
+  [E16] FORMULA: =F13+E14+E15  | cached_value: 0
+  [A17] VALUE: '満載数量マイナス5％'
+  [B17] FORMULA: =B15/1.05  | cached_value: 0
+  [D17] VALUE: '利益率別単価'
+  [E17] VALUE: 0.6
+  [F17] FORMULA: =E16*1.6  | cached_value: 0
+  [G17] FORMULA: =F17/B19  | cached_value: '#DIV/0!'
+  [H17] VALUE: 0.55
+  [I17] FORMULA: =E16*1.55  | cached_value: 0
+  [J17] FORMULA: =I17/B19  | cached_value: '#DIV/0!'
+  [A18] VALUE: '最適提案ｶｰﾄﾝ数'
+  [B18] FORMULA: =B17/B3  | cached_value: '#DIV/0!'
+  [C18] FORMULA: =ROUNDDOWN(B18, 0)  | cached_value: '#DIV/0!'
+  [E18] VALUE: 0.5
+  [F18] FORMULA: =E16*1.5  | cached_value: 0
+  [G18] FORMULA: =F18/B19  | cached_value: '#DIV/0!'
+  [H18] VALUE: 0.45
+  [I18] FORMULA: =E16*1.45  | cached_value: 0
+  [J18] FORMULA: =I18/B19  | cached_value: '#DIV/0!'
+  [A19] VALUE: '最適見積数量'
+  [B19] FORMULA: =B3*C18  | cached_value: '#DIV/0!'
+  [E19] VALUE: 0.4
+  [F19] FORMULA: =E16*1.4  | cached_value: 0
+  [G19] FORMULA: =F19/B19  | cached_value: '#DIV/0!'
+  [H19] VALUE: 0.35
+  [I19] FORMULA: =E16*1.35  | cached_value: 0
+  [J19] FORMULA: =I19/B19  | cached_value: '#DIV/0!'
+  [E20] VALUE: 0.3
+  [F20] FORMULA: =E16*1.3  | cached_value: 0
+  [G20] FORMULA: =F20/B19  | cached_value: '#DIV/0!'
+  [H20] VALUE: 0.25
+  [I20] FORMULA: =E16*1.25  | cached_value: 0
+  [J20] FORMULA: =I20/B19  | cached_value: '#DIV/0!'
+
+====================================================================================================
+  FILE 3: お見積書田中産業さまスター缶 (customer quote)
+  Path: C:/Users/wilfr/OneDrive/AI/Japan/Forms/お見積書田中産業さまスター缶 20260410.xlsx
+====================================================================================================
+
+SHEET NAMES: ['Sheet1', 'Sheet2']
+
+
+################################################################################
+  SHEET: "Sheet1"
+  Dimensions: A1:Q188  Max row: 188, Max col: 17
+################################################################################
+
+  MERGED CELLS: ['F20:H20', 'D20:E20', 'C34:D34', 'A34:B36', 'E28:F29', 'C24:D24', 'F18:H18', 'D19:E19', 'A37:B38', 'C22:H22', 'C42:J42', 'E34:J34', 'A21:B22', 'H2:J2', 'G25:J25', 'E17:F17', 'E39:F39', 'C21:H21', 'G17:H17', 'C45:J45', 'C35:D35', 'A16:B16', 'C16:D16', 'E36:J36', 'A23:B24', 'C25:D25', 'E26:F27', 'C47:J47', 'C32:J33', 'A40:B48', 'G28:J29', 'C44:J44', 'C41:J41', 'E24:H24', 'A51:J51', 'A25:B29', 'E23:H23', 'C28:D29', 'G39:J39', 'C43:J43', 'C46:J46', 'I16:J24', 'A18:B20', 'C36:D36', 'N9:Q10', 'E37:J37', 'A17:B17', 'D18:E18', 'C17:D17', 'C30:J31', 'C39:D39', 'C23:D23', 'I1:J1', 'G26:J27', 'E16:F16', 'F19:H19', 'C38:D38', 'G16:H16', 'E25:F25', 'A30:B33', 'C37:D37', 'A50:J50', 'C26:D27', 'E35:J35', 'E38:J38', 'A39:B39']
+
+  --- CELL DATA ---
+  [I1] VALUE: '日付 : 04/10/2026'
+  [D2] VALUE: '     御\u3000見\u3000積\u3000書'
+  [H2] VALUE: '見積番号: W11028624'
+  [A4] VALUE: '田中産業株式会社\u3000御中'
+  [A6] VALUE: '部署名'
+  [G6] VALUE: '株式会社WINHOOP'
+  [A7] VALUE: '担当者'
+  [B7] VALUE: '早川\u3000様'
+  [A8] VALUE: 'TEL：'
+  [G8] VALUE: '〒541-0044'
+  [A9] VALUE: 'FAX：'
+  [G9] VALUE: '大阪市中央区伏見町４丁目４番９号'
+  [G10] VALUE: 'オーエックス淀屋橋ビル３F'
+  [G11] VALUE: 'TEL：06-7176-9388'
+  [G12] VALUE: 'FAX：050-3488-7396'
+  [G13] VALUE: 'Email : info@winhoop.com'
+  [A14] VALUE: '下記の通りお見積申し上げます。'
+  [A16] VALUE: 'アイテム'
+  [C16] VALUE: '新型Star缶'
+  [E16] VALUE: 'サイズ'
+  [G16] VALUE: '200x200x50 mmH'
+  [A17] VALUE: '素材'
+  [C17] VALUE: 'スタンダード'
+  [E17] VALUE: '厚さ'
+  [G17] VALUE: '0.23㎜'
+  [A18] VALUE: '印刷方法'
+  [C18] VALUE: '外面'
+  [D18] VALUE: '蓋・身'
+  [F18] VALUE: '白コート+特②＋CMYK＋ツヤニス'
+  [C19] VALUE: '外面'
+  [D19] VALUE: '底'
+  [F19] VALUE: '白コート+特②＋CMYK＋ツヤニス'
+  [C20] VALUE: '内面'
+  [D20] VALUE: '蓋'
+  [F20] VALUE: 'ツヤニス'
+  [A21] VALUE: '梱包方法'
+  [C21] VALUE: '1缶ごとに紙巻き＋井桁→カートン'
+  [C22] VALUE: '24缶/箱\u3000カートンサイズ\u300043x43x36cm'
+  [A23] VALUE: '金型代'
+  [C23] VALUE: '金型費用'
+  [E23] VALUE: 1450000
+  [C24] VALUE: 'エンボスプレート'
+  [E24] VALUE: '-'
+  [A25] VALUE: 'お見積り金額'
+  [C25] VALUE: 'ご発注ロット数'
+  [E25] VALUE: '単価'
+  [G25] VALUE: 'ご発注合計金額（税別）'
+  [C26] VALUE: 20000
+  [E26] VALUE: 345
+  [G26] FORMULA: =C26*E26  | cached_value: 6900000
+  [C28] VALUE: 30000
+  [E28] VALUE: 310
+  [G28] FORMULA: =C28*E28  | cached_value: 9300000
+  [A30] VALUE: 'サンプル費用'
+  [C30] VALUE: '55,000円/回（サンプル校正機使用の場合、1種あたり）'
+  [C32] VALUE: 'プラサンプル\u300035,000円/個'
+  [A34] VALUE: '製造日数'
+  [C34] VALUE: '金型'
+  [E34] VALUE: '40日程度'
+  [C35] VALUE: 'サンプル'
+  [E35] VALUE: '15～20日＋空輸期間'
+  [C36] VALUE: '本生産'
+  [E36] VALUE: '最終ご発注後40－45日＋海上輸送（約2週間）'
+  [A37] VALUE: 'お支払い条件'
+  [C37] VALUE: '金型・サンプル'
+  [E37] VALUE: 'ご入金確認後に着手いたします'
+  [C38] VALUE: '本生産'
+  [E38] VALUE: 'お届け後、末締めご請求、翌月末お支払にて'
+  [A39] VALUE: 'お見積り有効期限'
+  [C39] VALUE: '30日間'
+  [E39] VALUE: '納品条件'
+  [G39] VALUE: '御社倉庫にコンテナで一括納品'
+  [A40] VALUE: 'その他'
+  [C41] VALUE: '\u3000\u3000\u3000本お見積りは現時点での概算お見積りとなります。'
+  [C42] VALUE: '\u3000\u3000\u3000本お見積りは1柄展開の場合のものとなります。'
+  [C43] VALUE: '\u3000\u3000\u3000本お見積りは事前お打ち合わせ済みのAQL2.5基準によるものです。'
+  [C44] VALUE: '\u3000\u3000\u3000サンプル作成は事前のお振込み完了頂き次第の着手となります。'
+  [C45] VALUE: '\u3000\u3000\u3000為替レート、１RMB＝22円換算での算出としております。'
+  [C46] VALUE: '\u3000\u3000\u3000本生産先出し等、空輸費用は別途発生いたします。'
+  [C47] VALUE: '\u3000\u3000\u3000コンテナ・パレットでの納品が不可の場合には、別途費用は発生しますが対応可能です。'
+  [A50] VALUE: '以上の通りです。ご不明な点等ございましたら何なりとお問合せください。'
+  [A51] VALUE: 'ご検討の程、よろしくお願いいたします。'
+
+################################################################################
+  SHEET: "Sheet2"
+  Dimensions: A1:A1  Max row: 1, Max col: 1
+################################################################################
+
+  --- CELL DATA ---
+
