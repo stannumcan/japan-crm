@@ -96,10 +96,15 @@ export default function CustomerQuoteForm({
     if (!printRef.current) return;
     setPrinting(true);
     try {
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+      const [h2cMod, jspdfMod] = await Promise.all([
         import("html2canvas"),
         import("jspdf"),
       ]);
+      // Handle both default and named exports across bundler variants
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const html2canvas: any = (h2cMod as any).default ?? h2cMod;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { jsPDF } = jspdfMod as any;
 
       const el = printRef.current;
       const canvas = await html2canvas(el, {
@@ -144,8 +149,9 @@ export default function CustomerQuoteForm({
 
       pdf.save(`${quoteNumber || "見積書"}.pdf`);
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
       console.error("PDF generation failed:", err);
-      alert("PDF generation failed. Please try again.");
+      alert(`PDF error: ${msg}`);
     } finally {
       setPrinting(false);
     }
