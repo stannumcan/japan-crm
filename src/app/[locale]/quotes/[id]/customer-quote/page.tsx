@@ -23,7 +23,7 @@ export default async function CustomerQuotePage({
       id, status, mold_type, mold_number, size_dimensions, embossment,
       design_count, shipping_info_required,
       printing_lid, printing_body, printing_bottom, printing_inner, printing_notes,
-      work_orders(id, wo_number, company_name, project_name),
+      work_orders(id, wo_number, company_name, project_name, company_id),
       quotation_quantity_tiers(tier_label, quantity_type, quantity, sort_order),
       natsuki_ddp_calculations!quotation_id(
         id, tier_label, quantity, unit_price_jpy, total_revenue_jpy,
@@ -32,7 +32,7 @@ export default async function CustomerQuotePage({
       ),
       factory_cost_sheets(
         mold_cost_new, mold_cost_modify, mold_lead_time_days,
-        steel_type, steel_thickness, outer_carton_qty, outer_carton_config, mold_number
+        steel_type, steel_thickness, product_dimensions, outer_carton_qty, outer_carton_config, mold_number
       ),
       customer_quotes(*)
     `)
@@ -46,7 +46,22 @@ export default async function CustomerQuotePage({
     wo_number: string;
     company_name: string;
     project_name: string;
+    company_id: string | null;
   } | null;
+
+  // Fetch contacts for this company if we have a company_id
+  type Contact = { id: string; name: string; department: string | null; phone: string | null; phone_direct: string | null };
+  let contacts: Contact[] = [];
+  if (wo?.company_id) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: contactRows } = await (supabase as any)
+      .from("company_contacts")
+      .select("id, name, department, phone, phone_direct")
+      .eq("company_id", wo.company_id)
+      .order("is_primary", { ascending: false })
+      .order("name");
+    contacts = (contactRows as Contact[]) ?? [];
+  }
 
   const ddpCalcs = (quote.natsuki_ddp_calculations as {
     id: string;
@@ -71,6 +86,7 @@ export default async function CustomerQuotePage({
     mold_lead_time_days: number | null;
     steel_type: string | null;
     steel_thickness: number | null;
+    product_dimensions: string | null;
     outer_carton_qty: number | null;
     outer_carton_config: string | null;
     mold_number: string | null;
@@ -82,20 +98,46 @@ export default async function CustomerQuotePage({
 
   // Compute default printing lines from quotation fields
   const defaultPrintingLines = [
-    quote.printing_lid && { part: "外面（蓋）", spec: quote.printing_lid as string },
-    quote.printing_body && { part: "外面（身）", spec: quote.printing_body as string },
-    quote.printing_bottom && { part: "外面（底）", spec: quote.printing_bottom as string },
-    quote.printing_inner && { part: "内面（蓋）", spec: quote.printing_inner as string },
-  ].filter(Boolean) as { part: string; spec: string }[];
+    quote.printing_lid && { surface: "外面", part: "蓋", spec: quote.printing_lid as string },
+    quote.printing_body && { surface: "外面", part: "身", spec: quote.printing_body as string },
+    quote.printing_bottom && { surface: "外面", part: "底", spec: quote.printing_bottom as string },
+    quote.printing_inner && { surface: "内面", part: "蓋", spec: quote.printing_inner as string },
+  ].filter(Boolean) as { surface: string; part: string; spec: string }[];
 
-  const defaultMaterial = sheet?.steel_type ?? "";
+  const defaultMaterial = sheet?.steel_type ?? "スタンダード";
   const defaultThickness = sheet?.steel_thickness ? `${sheet.steel_thickness}㎜` : "";
   const defaultPacking = [
     sheet?.outer_carton_qty && `${sheet.outer_carton_qty}缶/箱`,
     sheet?.outer_carton_config,
   ].filter(Boolean).join("　");
 
-  const sizeNote = (quote.size_dimensions as string) ?? "";
+  // Prefer factory sheet product_dimensions (per-mold), fall back to quotation size_dimensions
+  const sizeNote = sheet?.product_dimensions ?? (quote.size_dimensions as string) ?? "";
+
+  // Fetch image attachments for this quotation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: attachmentRows } = await (supabase as any)
+    .from("quotation_attachments")
+    .select("file_name, file_url, file_type")
+    .eq("quotation_id", id)
+    .order("uploaded_at", { ascending: false });
+
+  const quoteImages = ((attachmentRows ?? []) as { file_name: string; file_url: string; file_type: string | null }[])
+    .filter((a) => (a.file_type ?? "").startsWith("image/") || /\.(png|jpe?g|gif|webp|bmp)$/i.test(a.file_name))
+    .map((a) => ({ name: a.file_name, url: a.file_url }));
+
+  // Fetch mold image from the molds table (by mold_number on factory sheet)
+  const moldNumber = sheet?.mold_number ?? null;
+  let moldImageUrl: string | null = null;
+  if (moldNumber) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: moldRow } = await (supabase as any)
+      .from("molds")
+      .select("image_url")
+      .eq("mold_number", moldNumber)
+      .maybeSingle();
+    moldImageUrl = moldRow?.image_url ?? null;
+  }
 
   // Get FX rate from the first DDP calc
   const fxRateFromDDP = ddpCalcs[0]?.fx_rate_rmb_to_jpy ?? null;
@@ -146,6 +188,8 @@ export default async function CustomerQuotePage({
         quoteId={id}
         woNumber={wo?.wo_number ?? ""}
         companyName={wo?.company_name ?? ""}
+        companyId={wo?.company_id ?? null}
+        contacts={contacts}
         projectName={wo?.project_name ?? ""}
         sizeNote={sizeNote}
         ddpCalcs={ddpCalcs}
@@ -157,6 +201,8 @@ export default async function CustomerQuotePage({
         defaultPrintingLines={defaultPrintingLines}
         defaultPacking={defaultPacking}
         fxRateFromDDP={fxRateFromDDP}
+        quoteImages={quoteImages}
+        moldImageUrl={moldImageUrl}
         existingCQ={existingCQ}
       />
     </div>

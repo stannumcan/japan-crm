@@ -93,6 +93,7 @@ export default function FactorySheetForm({
   existingTierCosts,
   moldNumber,
   productDimensions,
+  tinThickness,
   returnTo,
 }: {
   locale: string;
@@ -102,6 +103,7 @@ export default function FactorySheetForm({
   existingTierCosts: ExistingTierCost[];
   moldNumber: string;
   productDimensions: string;
+  tinThickness?: string;
   returnTo?: string;
 }) {
   const router = useRouter();
@@ -121,6 +123,9 @@ export default function FactorySheetForm({
   const [sheetDate, setSheetDate] = useState(String(existingSheet?.sheet_date ?? ""));
   const [moldNum, setMoldNum] = useState(String(existingSheet?.mold_number ?? moldNumber));
   const [productDims, setProductDims] = useState(String(existingSheet?.product_dimensions ?? productDimensions));
+  const [steelThickness, setSteelThickness] = useState(
+    existingSheet?.steel_thickness != null ? String(existingSheet.steel_thickness) : (tinThickness ?? "")
+  );
 
   // Mold Costs
   const [moldCostNew, setMoldCostNew] = useState(String(existingSheet?.mold_cost_new ?? ""));
@@ -191,6 +196,7 @@ export default function FactorySheetForm({
       sheet_date: sheetDate || null,
       mold_number: moldNum || null,
       product_dimensions: productDims || null,
+      steel_thickness: parseFloat(steelThickness) || null,
       mold_cost_new: parseFloat(moldCostNew) || null,
       mold_cost_modify: parseFloat(moldCostAdjust) || null,
       mold_lead_time_days: parseInt(moldLeadTime) || null,
@@ -242,7 +248,7 @@ export default function FactorySheetForm({
       <Card>
         <CardHeader><CardTitle className="text-base">Sheet Info</CardTitle></CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label>Sheet Date</Label>
               <Input type="date" value={sheetDate} onChange={(e) => setSheetDate(e.target.value)} />
@@ -254,6 +260,16 @@ export default function FactorySheetForm({
             <div className="space-y-2">
               <Label>Product Dimensions</Label>
               <Input value={productDims} onChange={(e) => setProductDims(e.target.value)} placeholder="200×200×40mm" />
+            </div>
+            <div className="space-y-2">
+              <Label>板厚 Tin Thickness (mm)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={steelThickness}
+                onChange={(e) => setSteelThickness(e.target.value)}
+                placeholder="0.25"
+              />
             </div>
           </div>
         </CardContent>

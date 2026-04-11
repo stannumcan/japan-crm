@@ -43,7 +43,7 @@ export default async function DDPCalcPage({
       quotation_quantity_tiers(tier_label, quantity_type, quantity, sort_order),
       factory_cost_sheets(
         id, mold_number, mold_cost_new, mold_cost_modify, mold_lead_time_days,
-        packaging_lines,
+        steel_thickness, packaging_lines,
         wilfred_calculations(tier_label, quantity, estimated_cost_rmb, approved)
       ),
       natsuki_ddp_calculations!quotation_id(*)
@@ -81,7 +81,7 @@ export default async function DDPCalcPage({
     moldNumber: string | null;
     quoteInfo: {
       companyName: string; projectName: string; woNumber: string; canSize: string;
-      moldNumber: string; moldCostNew: number | null; moldCostModify: number | null; moldLeadTime: number | null;
+      moldNumber: string; tinThickness: number | null; moldCostNew: number | null; moldCostModify: number | null; moldLeadTime: number | null;
     };
     packagingDefaults: {
       pcsPerCarton: number | null; boxL: number | null; boxW: number | null; boxH: number | null;
@@ -128,6 +128,7 @@ export default async function DDPCalcPage({
         woNumber: wo?.wo_number ?? "",
         canSize: quote.size_dimensions ?? "",
         moldNumber: sheet.mold_number ?? quote.mold_number ?? "",
+        tinThickness: sheet.steel_thickness ?? null,
         moldCostNew: sheet.mold_cost_new ?? null,
         moldCostModify: sheet.mold_cost_modify ?? null,
         moldLeadTime: sheet.mold_lead_time_days ?? null,

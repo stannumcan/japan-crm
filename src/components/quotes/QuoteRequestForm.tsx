@@ -19,13 +19,13 @@ interface MoldEntry {
   type: "existing" | "new";
   value: string;       // mold number or new mold description
   size: string;        // e.g. 200×200×40mm BH
+  thickness: string;   // tin thickness in mm, e.g. 0.25
   design_count: string; // number of designs for this mold
 }
 
 interface MoldRecord {
   id: string;
   mold_number: string;
-  hm_number: string;
   category: string;
   variant: string;
   dimensions: string;
@@ -215,7 +215,7 @@ export default function QuoteRequestForm({
 
   // ── Product spec ─────────────────────────────────────────────────
   const [molds, setMolds] = useState<MoldEntry[]>([
-    { id: "1", type: "existing", value: "", size: "", design_count: "1" },
+    { id: "1", type: "existing", value: "", size: "", thickness: "", design_count: "1" },
   ]);
   const [printingNotes, setPrintingNotes] = useState("");
   const [embossmentNotes, setEmbossmentNotes] = useState("");
@@ -326,7 +326,7 @@ export default function QuoteRequestForm({
   };
 
   // ── Mold handlers ──────────────────────────────────────────────────
-  const addMold = () => setMolds((prev) => [...prev, { id: Date.now().toString(), type: "existing", value: "", size: "", design_count: "1" }]);
+  const addMold = () => setMolds((prev) => [...prev, { id: Date.now().toString(), type: "existing", value: "", size: "", thickness: "", design_count: "1" }]);
   const removeMold = (id: string) => { if (molds.length > 1) setMolds((prev) => prev.filter((m) => m.id !== id)); };
   // Use functional updater so batched calls compose correctly (not stale-closure overwrite)
   const updateMold = (id: string, field: keyof MoldEntry, val: string) =>
@@ -356,10 +356,11 @@ export default function QuoteRequestForm({
       urgency,
       shipping_info_required: shippingInfoRequired,
       molds: molds
-        .map(({ type, value, size, design_count }) => ({
+        .map(({ type, value, size, thickness, design_count }) => ({
           type,
           value: value.trim(),
           size: size.trim() || null,
+          thickness: thickness.trim() || null,
           design_count: parseInt(design_count) || 1,
         }))
         .filter((m) => m.value),
@@ -486,6 +487,7 @@ export default function QuoteRequestForm({
                     <th className="text-left text-xs font-medium text-gray-500 px-3 py-2 w-32">{t("moldType")}</th>
                     <th className="text-left text-xs font-medium text-gray-500 px-3 py-2">{t("moldNumber")}</th>
                     <th className="text-left text-xs font-medium text-gray-500 px-3 py-2 w-44">{t("sizeDimensions")}</th>
+                    <th className="text-left text-xs font-medium text-gray-500 px-3 py-2 w-28">板厚 Thickness (mm)</th>
                     <th className="text-left text-xs font-medium text-gray-500 px-3 py-2 w-24">{t("designCount")}</th>
                     <th className="w-8"></th>
                   </tr>
@@ -538,6 +540,14 @@ export default function QuoteRequestForm({
                           value={mold.size}
                           onChange={(e) => updateMold(mold.id, "size", e.target.value)}
                           placeholder="200×200×40mm"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <Input
+                          className="h-8 text-sm"
+                          value={mold.thickness}
+                          onChange={(e) => updateMold(mold.id, "thickness", e.target.value)}
+                          placeholder="0.25"
                         />
                       </td>
                       <td className="px-3 py-2">

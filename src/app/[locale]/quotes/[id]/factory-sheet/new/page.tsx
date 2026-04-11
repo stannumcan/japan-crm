@@ -19,7 +19,7 @@ export default async function NewFactorySheetPage({
   const { data: quote } = await (supabase as any)
     .from("quotations")
     .select(`
-      id, mold_number, size_dimensions,
+      id, mold_number, size_dimensions, molds,
       work_orders(wo_number, company_name, project_name),
       quotation_quantity_tiers(tier_label, quantity_type, quantity, sort_order)
     `)
@@ -30,6 +30,10 @@ export default async function NewFactorySheetPage({
 
   const wo = quote.work_orders as { wo_number: string; company_name: string; project_name: string } | null;
   const tiers = (quote.quotation_quantity_tiers as { tier_label: string; quantity_type: string; quantity: number | null; sort_order: number }[] | null) ?? [];
+  // Extract thickness from first mold entry in the JSONB array
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const molds = (quote.molds as any[]) ?? [];
+  const tinThickness = molds[0]?.thickness ?? undefined;
 
   return (
     <div className="p-6 max-w-5xl">
@@ -56,6 +60,7 @@ export default async function NewFactorySheetPage({
         existingTierCosts={[]}
         moldNumber={quote.mold_number ?? ""}
         productDimensions={quote.size_dimensions ?? ""}
+        tinThickness={tinThickness}
         returnTo={`/${locale}/quotes/${id}/factory-sheet`}
       />
     </div>

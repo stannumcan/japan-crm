@@ -18,6 +18,7 @@ interface QuoteInfo {
   woNumber: string;
   canSize: string;
   moldNumber: string;
+  tinThickness: number | null;
   moldCostNew: number | null;
   moldCostModify: number | null;
   moldLeadTime: number | null;
@@ -307,6 +308,7 @@ export default function DDPCalcForm({
             <span><span className="text-gray-400 text-xs">Customer</span><br /><span className="font-medium">{quoteInfo.companyName}</span></span>
             <span><span className="text-gray-400 text-xs">Style</span><br /><span className="font-medium">{quoteInfo.projectName}</span></span>
             {quoteInfo.canSize && <span><span className="text-gray-400 text-xs">Can Size</span><br /><span className="font-medium">{quoteInfo.canSize}</span></span>}
+            {quoteInfo.tinThickness != null && <span><span className="text-gray-400 text-xs">板厚 Thickness</span><br /><span className="font-medium">{quoteInfo.tinThickness} mm</span></span>}
             {quoteInfo.moldNumber && <span><span className="text-gray-400 text-xs">Mold</span><br /><span className="font-mono font-medium">{quoteInfo.moldNumber}</span></span>}
             {quoteInfo.moldCostNew != null && <span><span className="text-gray-400 text-xs">New Mold</span><br /><span className="font-medium">¥{quoteInfo.moldCostNew.toLocaleString()} RMB</span></span>}
             {quoteInfo.moldCostModify != null && <span><span className="text-gray-400 text-xs">Adj. Cost</span><br /><span className="font-medium">¥{quoteInfo.moldCostModify.toLocaleString()} RMB</span></span>}

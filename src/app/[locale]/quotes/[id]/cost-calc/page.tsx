@@ -26,6 +26,7 @@ export default async function CostCalcPage({
       factory_cost_sheets(
         id,
         mold_number,
+        steel_thickness,
         factory_cost_tiers(*),
         wilfred_calculations(*)
       )
@@ -40,6 +41,7 @@ export default async function CostCalcPage({
   type Sheet = {
     id: string;
     mold_number: string | null;
+    steel_thickness: number | null;
     factory_cost_tiers: {
       id: string;
       tier_label: string;
@@ -103,7 +105,10 @@ export default async function CostCalcPage({
         <div>
           <h1 className="text-xl font-bold text-gray-900">Wilfred Cost Calculation</h1>
           {wo && (
-            <p className="text-sm text-gray-500">{wo.wo_number} · {wo.project_name} · {wo.company_name}</p>
+            <p className="text-sm text-gray-500">
+              {wo.wo_number} · {wo.project_name} · {wo.company_name}
+              {sheets[0]?.steel_thickness ? ` · 板厚 ${sheets[0].steel_thickness} mm` : ""}
+            </p>
           )}
         </div>
       </div>
@@ -122,6 +127,7 @@ export default async function CostCalcPage({
             {sheets.map((sheet, i) => (
               <TabsTrigger key={sheet.id} value={sheet.id}>
                 {sheet.mold_number ?? `Sheet ${i + 1}`}
+                {sheet.steel_thickness ? ` · ${sheet.steel_thickness}mm` : ""}
               </TabsTrigger>
             ))}
           </TabsList>

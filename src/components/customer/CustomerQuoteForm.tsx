@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Printer, Plus, Trash2 } from "lucide-react";
+import { Printer, Plus, Trash2, ImagePlus, X } from "lucide-react";
+
+const SUPABASE_URL = "https://lwdxvcrvrzlfetelcemt.supabase.co";
+const BUCKET = "quote-attachments";
 
 interface DDPCalc {
   id: string;
@@ -22,8 +26,20 @@ interface DDPCalc {
 }
 
 interface PrintingLine {
-  part: string;
+  surface: string; // 外面 | 内面
+  part: string;    // 蓋 | 身 | 底 | 蓋・身 | 蓋・身・底 | custom
   spec: string;
+}
+
+const SURFACE_OPTIONS = ["外面", "内面"];
+const PART_PRESETS = ["蓋", "身", "底", "蓋・身", "蓋・身・底"];
+
+interface Contact {
+  id: string;
+  name: string;
+  department: string | null;
+  phone: string | null;
+  phone_direct: string | null;
 }
 
 interface Props {
@@ -31,6 +47,8 @@ interface Props {
   quoteId: string;
   woNumber: string;
   companyName: string;
+  companyId: string | null;
+  contacts: Contact[];
   projectName: string;
   sizeNote: string;
   ddpCalcs: DDPCalc[];
@@ -42,6 +60,8 @@ interface Props {
   defaultPrintingLines: PrintingLine[];
   defaultPacking: string;
   fxRateFromDDP: number | null;
+  quoteImages: { name: string; url: string }[];
+  moldImageUrl: string | null;
   existingCQ: Record<string, unknown> | null;
 }
 
@@ -53,10 +73,15 @@ function fmtJpy(n: number | string | null | undefined): string {
 
 function parseExistingLines(raw: unknown, fallback: PrintingLine[]): PrintingLine[] {
   if (Array.isArray(raw) && raw.length > 0) {
-    return (raw as PrintingLine[]).map((r) => ({
-      part: String(r.part ?? ""),
-      spec: String(r.spec ?? ""),
-    }));
+    return (raw as PrintingLine[]).map((r) => {
+      // New format already has surface field
+      if (r.surface) return { surface: String(r.surface), part: String(r.part ?? ""), spec: String(r.spec ?? "") };
+      // Legacy format: part was e.g. "外面（蓋）" — split it
+      const legacy = String(r.part ?? "");
+      const match = legacy.match(/^(外面|内面)[（(](.+?)[)）]$/);
+      if (match) return { surface: match[1], part: match[2], spec: String(r.spec ?? "") };
+      return { surface: "外面", part: legacy, spec: String(r.spec ?? "") };
+    });
   }
   return fallback;
 }
@@ -73,6 +98,8 @@ export default function CustomerQuoteForm({
   quoteId,
   woNumber,
   companyName,
+  companyId,
+  contacts: initialContacts,
   projectName,
   sizeNote,
   ddpCalcs,
@@ -84,6 +111,8 @@ export default function CustomerQuoteForm({
   defaultPrintingLines,
   defaultPacking,
   fxRateFromDDP,
+  quoteImages,
+  moldImageUrl,
   existingCQ,
 }: Props) {
   const router = useRouter();
@@ -91,6 +120,75 @@ export default function CustomerQuoteForm({
   const [error, setError] = useState("");
   const [printing, setPrinting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+
+  // ── contacts state ──────────────────────────────────────────
+  const [contacts, setContacts] = useState<Contact[]>(initialContacts);
+  const [showAddContact, setShowAddContact] = useState(false);
+  const [newContactName, setNewContactName] = useState("");
+  const [newContactDept, setNewContactDept] = useState("");
+  const [newContactPhone, setNewContactPhone] = useState("");
+  const [addingContact, setAddingContact] = useState(false);
+
+  const handleAddContact = async () => {
+    if (!newContactName.trim() || !companyId) return;
+    setAddingContact(true);
+    try {
+      const res = await fetch("/api/company-contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company_id: companyId,
+          name: newContactName.trim(),
+          department: newContactDept.trim() || null,
+          phone: newContactPhone.trim() || null,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to add contact");
+      const created: Contact = await res.json();
+      setContacts((prev) => [...prev, created]);
+      // Auto-select the new contact
+      setCustomerContact(created.name);
+      setCustomerDept(created.department ?? "");
+      setCustomerTel(created.phone ?? "");
+      // Reset form
+      setNewContactName("");
+      setNewContactDept("");
+      setNewContactPhone("");
+      setShowAddContact(false);
+    } catch {
+      // silent — contact list still updates on next page load
+    } finally {
+      setAddingContact(false);
+    }
+  };
+
+  // ── product image state ────────────────────────────────────
+  const [productImageUrl, setProductImageUrl] = useState<string>(
+    String(existingCQ?.product_image_url ?? "")
+  );
+  const [imageTab, setImageTab] = useState<"quote" | "mold" | "upload">("quote");
+  const [imageUploading, setImageUploading] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = useCallback(async (file: File) => {
+    setImageUploading(true);
+    try {
+      const supabase = createClient();
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `product-images/${quoteId}/${Date.now()}-${safeName}`;
+      const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+      if (error) throw error;
+      const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+      setProductImageUrl(url);
+    } catch (err) {
+      alert("Image upload failed: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setImageUploading(false);
+    }
+  }, [quoteId]);
 
   const handlePrint = async () => {
     if (!printRef.current) return;
@@ -275,7 +373,7 @@ export default function CustomerQuoteForm({
   const removePrintingLine = (idx: number) =>
     setPrintingLines((prev) => prev.filter((_, i) => i !== idx));
   const addPrintingLine = () =>
-    setPrintingLines((prev) => [...prev, { part: "", spec: "" }]);
+    setPrintingLines((prev) => [...prev, { surface: "外面", part: "蓋", spec: "" }]);
 
   const updateNote = (idx: number, val: string) =>
     setNotesLines((prev) => prev.map((n, i) => (i === idx ? val : n)));
@@ -330,6 +428,7 @@ export default function CustomerQuoteForm({
         delivery_condition: deliveryCondition || null,
         fx_rate_note: parseFloat(fxRateNote) || null,
         notes_lines: notesLines,
+        product_image_url: productImageUrl || null,
       };
 
       const method = existingCQ ? "PATCH" : "POST";
@@ -425,27 +524,126 @@ export default function CustomerQuoteForm({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-gray-600">顧客情報 Customer</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-3 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs">顧客名 Company</Label>
-              <Input value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-3 gap-3">
+              {/* Company name — read-only, pulled from quote */}
+              <div className="space-y-1">
+                <Label className="text-xs">顧客名 Company</Label>
+                <div className="flex h-9 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground items-center">
+                  {customerName}
+                </div>
+              </div>
+
+              {/* Contact — dropdown from company_contacts */}
+              <div className="space-y-1">
+                <Label className="text-xs">担当者 Contact</Label>
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  value={customerContact}
+                  onChange={(e) => {
+                    const selected = contacts.find((c) => c.name === e.target.value);
+                    setCustomerContact(e.target.value);
+                    if (selected) {
+                      setCustomerDept(selected.department ?? "");
+                      setCustomerTel(selected.phone_direct ?? selected.phone ?? "");
+                    }
+                  }}
+                >
+                  <option value="">— 選択 / 未設定 —</option>
+                  {contacts.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}{c.department ? ` (${c.department})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Department — auto-filled or manual */}
+              <div className="space-y-1">
+                <Label className="text-xs">部署名 Department</Label>
+                <Input value={customerDept} onChange={(e) => setCustomerDept(e.target.value)} />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">TEL</Label>
+                <Input value={customerTel} onChange={(e) => setCustomerTel(e.target.value)} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">FAX</Label>
+                <Input value={customerFax} onChange={(e) => setCustomerFax(e.target.value)} />
+              </div>
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">部署名 Department</Label>
-              <Input value={customerDept} onChange={(e) => setCustomerDept(e.target.value)} />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">担当者 Contact</Label>
-              <Input value={customerContact} onChange={(e) => setCustomerContact(e.target.value)} placeholder="e.g. 早川" />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">TEL</Label>
-              <Input value={customerTel} onChange={(e) => setCustomerTel(e.target.value)} />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">FAX</Label>
-              <Input value={customerFax} onChange={(e) => setCustomerFax(e.target.value)} />
-            </div>
+
+            {/* Add new contact */}
+            {companyId && (
+              <div>
+                {!showAddContact ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 text-xs"
+                    onClick={() => setShowAddContact(true)}
+                  >
+                    <Plus className="h-3 w-3" />
+                    担当者を追加 Add New Contact
+                  </Button>
+                ) : (
+                  <div className="border rounded-md p-3 space-y-2 bg-gray-50">
+                    <p className="text-xs font-medium text-gray-600">新しい担当者 New Contact</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs">名前 Name *</Label>
+                        <Input
+                          className="text-xs"
+                          value={newContactName}
+                          onChange={(e) => setNewContactName(e.target.value)}
+                          placeholder="田中 太郎"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">部署 Department</Label>
+                        <Input
+                          className="text-xs"
+                          value={newContactDept}
+                          onChange={(e) => setNewContactDept(e.target.value)}
+                          placeholder="購買部"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">TEL</Label>
+                        <Input
+                          className="text-xs"
+                          value={newContactPhone}
+                          onChange={(e) => setNewContactPhone(e.target.value)}
+                          placeholder="06-0000-0000"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="text-xs"
+                        onClick={handleAddContact}
+                        disabled={addingContact || !newContactName.trim()}
+                      >
+                        {addingContact ? "保存中..." : "保存 Save"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => setShowAddContact(false)}
+                      >
+                        キャンセル
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -480,12 +678,50 @@ export default function CustomerQuoteForm({
               <div className="space-y-2">
                 {printingLines.map((ln, i) => (
                   <div key={i} className="flex gap-2 items-center">
-                    <Input
-                      className="w-44 text-xs"
-                      placeholder="部位 e.g. 外面（蓋）"
-                      value={ln.part}
-                      onChange={(e) => updatePrintingLine(i, "part", e.target.value)}
-                    />
+                    {/* Col 1: 外面 / 内面 */}
+                    <select
+                      className="flex h-8 rounded-md border border-input bg-background px-2 text-xs shadow-sm focus:outline-none focus:ring-1 focus:ring-ring w-20"
+                      value={ln.surface}
+                      onChange={(e) => updatePrintingLine(i, "surface", e.target.value)}
+                    >
+                      {SURFACE_OPTIONS.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+
+                    {/* Col 2: part preset or custom text */}
+                    {PART_PRESETS.includes(ln.part) || ln.part === "" ? (
+                      <select
+                        className="flex h-8 rounded-md border border-input bg-background px-2 text-xs shadow-sm focus:outline-none focus:ring-1 focus:ring-ring w-36"
+                        value={ln.part}
+                        onChange={(e) => {
+                          if (e.target.value === "__custom__") {
+                            updatePrintingLine(i, "part", "");
+                          } else {
+                            updatePrintingLine(i, "part", e.target.value);
+                          }
+                        }}
+                      >
+                        <option value="">— 選択 —</option>
+                        {PART_PRESETS.map((p) => (
+                          <option key={p} value={p}>{p}</option>
+                        ))}
+                        <option value="__custom__">＋ カスタム...</option>
+                      </select>
+                    ) : (
+                      <Input
+                        className="h-8 text-xs w-36"
+                        value={ln.part}
+                        onChange={(e) => updatePrintingLine(i, "part", e.target.value)}
+                        placeholder="カスタム部位"
+                        onBlur={(e) => {
+                          // If user blanked it out, revert to preset dropdown
+                          if (!e.target.value.trim()) updatePrintingLine(i, "part", "");
+                        }}
+                      />
+                    )}
+
+                    {/* Col 3: spec */}
                     <Input
                       className="flex-1 text-xs"
                       placeholder="仕様 e.g. 白コート+特②..."
@@ -518,6 +754,109 @@ export default function CustomerQuoteForm({
             <div className="space-y-1">
               <Label className="text-xs">梱包方法 Packing</Label>
               <Input value={packingDetails} onChange={(e) => setPackingDetails(e.target.value)} />
+            </div>
+
+            {/* Product Image Picker */}
+            <div className="space-y-2 pt-1 border-t">
+              <Label className="text-xs">製品画像 Product Image</Label>
+
+              {/* Current image preview */}
+              {productImageUrl && (
+                <div className="relative inline-block">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={productImageUrl}
+                    alt="product"
+                    className="h-24 w-auto border rounded object-contain bg-gray-50"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setProductImageUrl("")}
+                    className="absolute -top-1 -right-1 bg-white border rounded-full p-0.5 text-gray-400 hover:text-red-500"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+
+              {/* Source tabs */}
+              <div className="flex gap-1 text-xs">
+                {(["quote", "mold", "upload"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setImageTab(tab)}
+                    className={`px-3 py-1 rounded border text-xs ${imageTab === tab ? "bg-gray-800 text-white border-gray-800" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`}
+                  >
+                    {tab === "quote" ? "Quote Files" : tab === "mold" ? "Mold Image" : "Upload New"}
+                  </button>
+                ))}
+              </div>
+
+              {/* Quote images grid */}
+              {imageTab === "quote" && (
+                quoteImages.length === 0 ? (
+                  <p className="text-xs text-gray-400">No images attached to this quote.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {quoteImages.map((img) => (
+                      <button
+                        key={img.url}
+                        type="button"
+                        onClick={() => setProductImageUrl(img.url)}
+                        className={`border-2 rounded p-0.5 ${productImageUrl === img.url ? "border-blue-500" : "border-gray-200 hover:border-gray-400"}`}
+                        title={img.name}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img.url} alt={img.name} className="h-16 w-auto object-contain" />
+                      </button>
+                    ))}
+                  </div>
+                )
+              )}
+
+              {/* Mold image */}
+              {imageTab === "mold" && (
+                moldImageUrl ? (
+                  <button
+                    type="button"
+                    onClick={() => setProductImageUrl(moldImageUrl!)}
+                    className={`border-2 rounded p-0.5 ${productImageUrl === moldImageUrl ? "border-blue-500" : "border-gray-200 hover:border-gray-400"}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={moldImageUrl} alt="mold" className="h-24 w-auto object-contain" />
+                  </button>
+                ) : (
+                  <p className="text-xs text-gray-400">No image on file for this mold. Upload one in the Products page.</p>
+                )
+              )}
+
+              {/* Upload new */}
+              {imageTab === "upload" && (
+                <div>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleImageUpload(f);
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 text-xs"
+                    onClick={() => imageInputRef.current?.click()}
+                    disabled={imageUploading}
+                  >
+                    <ImagePlus className="h-3 w-3" />
+                    {imageUploading ? "Uploading..." : "Choose Image File"}
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -779,75 +1118,104 @@ export default function CustomerQuoteForm({
           下記の通りお見積申し上げます。
         </div>
 
-        {/* ── Item details table ── */}
-        <table
-          style={{ width: "100%", marginBottom: "8px", borderCollapse: "collapse", fontSize: "11px" }}
-        >
-          <tbody>
-            {/* アイテム / サイズ */}
-            <tr>
-              <td style={S.labelCell}>アイテム</td>
-              <td style={{ ...S.cell, width: "30%" }}>
-                {itemName}
-              </td>
-              <td style={S.labelCell}>サイズ</td>
-              <td style={S.cell}>{sizeNoteState}</td>
-            </tr>
-            {/* 素材 / 厚さ */}
-            <tr>
-              <td style={S.labelCell}>素材</td>
-              <td style={S.cell}>{material}</td>
-              <td style={S.labelCell}>厚さ</td>
-              <td style={S.cell}>{thickness}</td>
-            </tr>
-            {/* 印刷方法 rows */}
-            {printingLines.length === 0 ? (
+        {/* ── Item details + optional product image ── */}
+        <div style={{ display: "flex", gap: "8px", marginBottom: "8px", alignItems: "stretch" }}>
+          {/* Left: item details table */}
+          <table
+            style={{ flex: 1, borderCollapse: "collapse", fontSize: "11px" }}
+          >
+            <tbody>
+              {/* アイテム / サイズ */}
               <tr>
-                <td style={S.labelCell}>印刷方法</td>
-                <td style={S.cell} colSpan={3}></td>
+                <td style={S.labelCell}>アイテム</td>
+                <td style={{ ...S.cell, width: "30%" }}>
+                  {itemName}
+                </td>
+                <td style={S.labelCell}>サイズ</td>
+                <td style={S.cell}>{sizeNoteState}</td>
               </tr>
-            ) : (
-              printingLines.map((ln, i) => (
-                <tr key={i}>
-                  <td style={S.labelCell}>
-                    {i === 0 ? "印刷方法" : ""}
-                  </td>
-                  <td style={S.cell}>{ln.part}</td>
-                  <td style={S.cell} colSpan={2}>
-                    {ln.spec}
-                  </td>
-                </tr>
-              ))
-            )}
-            {/* 梱包方法 */}
-            <tr>
-              <td style={S.labelCell}>梱包方法</td>
-              <td style={S.cell} colSpan={3}>
-                {packingDetails}
-              </td>
-            </tr>
-            {/* 金型代 */}
-            {(moldType === "new" || moldCostJpy) && (
-              <>
+              {/* 素材 / 厚さ */}
+              <tr>
+                <td style={S.labelCell}>素材</td>
+                <td style={S.cell}>{material}</td>
+                <td style={S.labelCell}>厚さ</td>
+                <td style={S.cell}>{thickness}</td>
+              </tr>
+              {/* 印刷方法 rows */}
+              {printingLines.length === 0 ? (
                 <tr>
-                  <td style={S.labelCell} rowSpan={2}>
-                    金型代
-                  </td>
-                  <td style={S.cell}>金型費用</td>
-                  <td style={{ ...S.cell, textAlign: "right" }} colSpan={2}>
-                    {moldCostJpy ? fmtJpy(moldCostJpy) : "―"}
-                  </td>
+                  <td style={S.labelCell}>印刷方法</td>
+                  <td style={S.cell} colSpan={3}></td>
                 </tr>
-                <tr>
-                  <td style={S.cell}>エンボスプレート</td>
-                  <td style={{ ...S.cell, textAlign: "right" }} colSpan={2}>
-                    {embossCostJpy ? fmtJpy(embossCostJpy) : "―"}
-                  </td>
-                </tr>
-              </>
-            )}
-          </tbody>
-        </table>
+              ) : (
+                printingLines.map((ln, i) => (
+                  <tr key={i}>
+                    <td style={S.labelCell}>
+                      {i === 0 ? "印刷方法" : ""}
+                    </td>
+                    <td style={S.cell}>
+                      {ln.surface && ln.part ? `${ln.surface}（${ln.part}）` : ln.part || ln.surface}
+                    </td>
+                    <td style={S.cell} colSpan={2}>
+                      {ln.spec}
+                    </td>
+                  </tr>
+                ))
+              )}
+              {/* 梱包方法 */}
+              <tr>
+                <td style={S.labelCell}>梱包方法</td>
+                <td style={S.cell} colSpan={3}>
+                  {packingDetails}
+                </td>
+              </tr>
+              {/* 金型代 */}
+              {(moldType === "new" || moldCostJpy) && (
+                <>
+                  <tr>
+                    <td style={S.labelCell} rowSpan={2}>
+                      金型代
+                    </td>
+                    <td style={S.cell}>金型費用</td>
+                    <td style={{ ...S.cell, textAlign: "right" }} colSpan={2}>
+                      {moldCostJpy ? fmtJpy(moldCostJpy) : "―"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={S.cell}>エンボスプレート</td>
+                    <td style={{ ...S.cell, textAlign: "right" }} colSpan={2}>
+                      {embossCostJpy ? fmtJpy(embossCostJpy) : "―"}
+                    </td>
+                  </tr>
+                </>
+              )}
+            </tbody>
+          </table>
+
+          {/* Right: product image (only if set) */}
+          {productImageUrl && (
+            <div
+              style={{
+                width: "140px",
+                flexShrink: 0,
+                border: "1px solid #9ca3af",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "4px",
+                backgroundColor: "#fafafa",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={productImageUrl}
+                alt="product"
+                crossOrigin="anonymous"
+                style={{ maxWidth: "100%", maxHeight: "160px", objectFit: "contain" }}
+              />
+            </div>
+          )}
+        </div>
 
         {/* ── Pricing table ── */}
         <table

@@ -21,7 +21,7 @@ export default async function EditFactorySheetPage({
     (supabase as any)
       .from("quotations")
       .select(`
-        id, mold_number, size_dimensions,
+        id, mold_number, size_dimensions, molds,
         work_orders(wo_number, company_name, project_name),
         quotation_quantity_tiers(tier_label, quantity_type, quantity, sort_order)
       `)
@@ -43,6 +43,11 @@ export default async function EditFactorySheetPage({
   const tiers = (quote.quotation_quantity_tiers as { tier_label: string; quantity_type: string; quantity: number | null; sort_order: number }[] | null) ?? [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const existingTierCosts = (sheet.factory_cost_tiers ?? []) as any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const molds = (quote.molds as any[]) ?? [];
+  // Match mold by mold_number to find the right thickness (fall back to first mold)
+  const matchedMold = molds.find((m: any) => m.value === sheet.mold_number) ?? molds[0];
+  const tinThickness = matchedMold?.thickness ?? undefined;
 
   return (
     <div className="p-6 max-w-5xl">
@@ -69,6 +74,7 @@ export default async function EditFactorySheetPage({
         existingTierCosts={existingTierCosts}
         moldNumber={quote.mold_number ?? ""}
         productDimensions={quote.size_dimensions ?? ""}
+        tinThickness={tinThickness}
         returnTo={`/${locale}/quotes/${id}/factory-sheet`}
       />
     </div>
