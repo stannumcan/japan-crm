@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const body = await request.json();
-  const { components, tiers, ...sheetData } = body;
+  const { tiers, ...sheetData } = body;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: sheet, error } = await (supabase as any)
@@ -14,14 +14,6 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  // Insert components (lid/body/bottom/inner)
-  if (components?.length) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("factory_cost_components").insert(
-      components.map((c: object) => ({ ...c, cost_sheet_id: sheet.id }))
-    );
-  }
 
   // Insert cost tiers
   if (tiers?.length) {
@@ -44,7 +36,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient();
   const body = await request.json();
-  const { id, components, tiers, ...sheetData } = body;
+  const { id, tiers, ...sheetData } = body;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
@@ -55,6 +47,16 @@ export async function PATCH(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Replace tiers: delete existing then re-insert
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any).from("factory_cost_tiers").delete().eq("cost_sheet_id", id);
+  if (tiers?.length) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("factory_cost_tiers").insert(
+      tiers.map((t: object) => ({ ...t, cost_sheet_id: id }))
+    );
+  }
 
   return NextResponse.json(data);
 }
