@@ -20,16 +20,12 @@ export default async function DDPCalcPage({
   const { data: quote } = await (supabase as any)
     .from("quotations")
     .select(`
-      id, status,
+      id, status, mold_number, size_dimensions,
       work_orders(wo_number, company_name, project_name),
       quotation_quantity_tiers(tier_label, quantity_type, quantity, sort_order),
       factory_cost_sheets(
-        id,
-        outer_carton_qty,
-        outer_carton_l, outer_carton_w, outer_carton_h, outer_carton_cbm,
-        pallet_l, pallet_w, pallet_h,
-        cans_per_pallet,
-        factory_cost_tiers(tier_label, quantity, total_subtotal),
+        id, mold_number, mold_cost_new, mold_cost_modify, mold_lead_time_days,
+        packaging_lines,
         wilfred_calculations(tier_label, quantity, estimated_cost_rmb, approved)
       ),
       natsuki_ddp_calculations(*)
@@ -40,21 +36,23 @@ export default async function DDPCalcPage({
   if (!quote) notFound();
 
   const wo = quote.work_orders as { wo_number: string; company_name: string; project_name: string } | null;
-  const sheets = Array.isArray(quote.factory_cost_sheets) ? quote.factory_cost_sheets : [quote.factory_cost_sheets].filter(Boolean);
-  const sheet = (sheets as Record<string, unknown>[] | null)?.[0] ?? null;
+  const quoteTiers = ((quote.quotation_quantity_tiers ?? []) as { tier_label: string; quantity_type: string; quantity: number | null; sort_order: number }[])
+    .sort((a, b) => a.sort_order - b.sort_order);
 
-  // Flatten wilfred_calculations from all sheets
+  // Use first factory cost sheet for packaging specs
+  const sheets = Array.isArray(quote.factory_cost_sheets)
+    ? quote.factory_cost_sheets
+    : quote.factory_cost_sheets ? [quote.factory_cost_sheets] : [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const wilfredCalcs = (sheets as any[]).flatMap((s) =>
-    Array.isArray(s.wilfred_calculations) ? s.wilfred_calculations : []
-  ) as {
-    tier_label: string;
-    quantity: number;
-    estimated_cost_rmb: number | null;
-    approved: boolean;
-  }[];
+  const sheet = (sheets as any[])[0] ?? null;
 
-  const approvedCalcs = wilfredCalcs.filter((c) => c.approved);
+  // Flatten approved wilfred calcs across all sheets
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allWilfredCalcs = (sheets as any[]).flatMap((s) =>
+    Array.isArray(s.wilfred_calculations) ? s.wilfred_calculations : []
+  ) as { tier_label: string; quantity: number; estimated_cost_rmb: number | null; approved: boolean }[];
+
+  const approvedCalcs = allWilfredCalcs.filter((c) => c.approved);
 
   if (!sheet || approvedCalcs.length === 0) {
     return (
@@ -78,6 +76,47 @@ export default async function DDPCalcPage({
     );
   }
 
+  // Extract packaging specs from packaging_lines JSONB
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const packagingLines: any[] = Array.isArray(sheet.packaging_lines) ? sheet.packaging_lines : [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const outerCarton = packagingLines.find((l: any) => l.type === "outer_carton");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pallet = packagingLines.find((l: any) => l.type === "pallet");
+
+  const packagingDefaults = {
+    pcsPerCarton: outerCarton?.tins ?? null,
+    boxL: outerCarton?.l ?? null,
+    boxW: outerCarton?.w ?? null,
+    boxH: outerCarton?.h ?? null,
+    palletL: pallet?.l ?? null,
+    palletW: pallet?.w ?? null,
+    palletH: pallet?.h ?? null,
+    boxesPerPallet: (pallet?.tins && outerCarton?.tins)
+      ? Math.round(pallet.tins / outerCarton.tins)
+      : null,
+  };
+
+  const quoteInfo = {
+    companyName: wo?.company_name ?? "",
+    projectName: wo?.project_name ?? "",
+    woNumber: wo?.wo_number ?? "",
+    canSize: quote.size_dimensions ?? "",
+    moldNumber: sheet.mold_number ?? quote.mold_number ?? "",
+    moldCostNew: sheet.mold_cost_new ?? null,
+    moldCostModify: sheet.mold_cost_modify ?? null,
+    moldLeadTime: sheet.mold_lead_time_days ?? null,
+  };
+
+  // Merge approved calcs with quantity_type from quote tiers
+  const tiersForForm = approvedCalcs.map((calc) => {
+    const quoteTier = quoteTiers.find((t) => t.tier_label === calc.tier_label);
+    return {
+      ...calc,
+      quantity_type: quoteTier?.quantity_type ?? "units",
+    };
+  });
+
   const existingDDP = (quote.natsuki_ddp_calculations as Record<string, unknown>[]) ?? [];
 
   return (
@@ -90,7 +129,7 @@ export default async function DDPCalcPage({
           </Button>
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-gray-900">DDP Calculation (Japan)</h1>
+          <h1 className="text-xl font-bold text-gray-900">DDP Calculation — 発注数量別単価計算表</h1>
           {wo && (
             <p className="text-sm text-gray-500">{wo.wo_number} · {wo.project_name} · {wo.company_name}</p>
           )}
@@ -100,8 +139,9 @@ export default async function DDPCalcPage({
       <DDPCalcForm
         locale={locale}
         quoteId={id}
-        approvedCalcs={approvedCalcs}
-        sheet={sheet}
+        quoteInfo={quoteInfo}
+        packagingDefaults={packagingDefaults}
+        approvedCalcs={tiersForForm}
         existingDDP={existingDDP}
       />
     </div>
