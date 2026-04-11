@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -89,6 +90,30 @@ export default function CustomerQuoteForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [printing, setPrinting] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = async () => {
+    if (!printRef.current) return;
+    setPrinting(true);
+    try {
+      // Dynamic import — html2pdf.js is browser-only
+      const html2pdf = (await import("html2pdf.js")).default;
+      const filename = `${quoteNumber || "見積書"}.pdf`;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const opts: any = {
+        margin: [8, 8, 8, 8],
+        filename,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["avoid-all", "css"] },
+      };
+      await html2pdf().set(opts).from(printRef.current).save();
+    } finally {
+      setPrinting(false);
+    }
+  };
 
   // ── editable state ──────────────────────────────────────────
   const [quoteNumber, setQuoteNumber] = useState(
@@ -549,11 +574,12 @@ export default function CustomerQuoteForm({
         <Button
           type="button"
           variant="outline"
-          onClick={() => window.print()}
+          onClick={handlePrint}
+          disabled={printing}
           className="gap-2"
         >
           <Printer className="h-4 w-4" />
-          印刷 / PDF
+          {printing ? "生成中..." : "PDF ダウンロード"}
         </Button>
         <Button type="button" onClick={handleSave} disabled={loading}>
           {loading ? "Saving..." : "Save Quote Record"}
@@ -564,6 +590,7 @@ export default function CustomerQuoteForm({
           PRINT DOCUMENT — always visible, A4-style
       ═══════════════════════════════════════════════════════ */}
       <div
+        ref={printRef}
         className="bg-white border border-gray-300 print:border-0 print:shadow-none"
         style={{
           fontFamily: "'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif",
@@ -634,14 +661,27 @@ export default function CustomerQuoteForm({
 
               {/* WINHOOP address — fixed */}
               <td className="align-top" style={{ width: "45%", fontSize: "11px" }}>
-                <div className="font-bold" style={{ fontSize: "13px" }}>
-                  株式会社WINHOOP
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                  <div style={{ flex: 1 }}>
+                    <div className="font-bold" style={{ fontSize: "13px" }}>
+                      株式会社WINHOOP
+                    </div>
+                    <div>〒541-0044</div>
+                    <div>大阪市中央区伏見町４丁目４番９号</div>
+                    <div>オーエックス淀屋橋ビル３F</div>
+                    <div>TEL：06-7176-9388 / FAX：050-3488-7396</div>
+                    <div>Email : info@winhoop.com</div>
+                  </div>
+                  <div style={{ flexShrink: 0 }}>
+                    <Image
+                      src="/stamp-winhoop.png"
+                      alt="WINHOOP stamp"
+                      width={72}
+                      height={72}
+                      style={{ opacity: 0.9 }}
+                    />
+                  </div>
                 </div>
-                <div>〒541-0044</div>
-                <div>大阪市中央区伏見町４丁目４番９号</div>
-                <div>オーエックス淀屋橋ビル３F</div>
-                <div>TEL：06-7176-9388 / FAX：050-3488-7396</div>
-                <div>Email : info@winhoop.com</div>
               </td>
             </tr>
           </tbody>
