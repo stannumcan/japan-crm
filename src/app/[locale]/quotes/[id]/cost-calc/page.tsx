@@ -25,9 +25,9 @@ export default async function CostCalcPage({
       work_orders(wo_number, company_name, project_name),
       factory_cost_sheets(
         id,
-        factory_cost_tiers(*)
-      ),
-      wilfred_calculations(*)
+        factory_cost_tiers(*),
+        wilfred_calculations(*)
+      )
     `)
     .eq("id", id)
     .single();
@@ -36,7 +36,7 @@ export default async function CostCalcPage({
 
   const wo = quote.work_orders as { wo_number: string; company_name: string; project_name: string } | null;
   const sheets = Array.isArray(quote.factory_cost_sheets) ? quote.factory_cost_sheets : [quote.factory_cost_sheets].filter(Boolean);
-  const sheet = (sheets as { id: string; factory_cost_tiers: unknown[] }[] | null)?.[0] ?? null;
+  const sheet = (sheets as { id: string; factory_cost_tiers: unknown[]; wilfred_calculations: unknown[] }[] | null)?.[0] ?? null;
 
   if (!sheet) {
     return (
@@ -70,7 +70,7 @@ export default async function CostCalcPage({
     container_info: string | null;
   }[]) ?? [];
 
-  const existingCalcs = (quote.wilfred_calculations as {
+  const existingCalcs = (sheet.wilfred_calculations as {
     id: string;
     tier_label: string;
     total_subtotal: number;
