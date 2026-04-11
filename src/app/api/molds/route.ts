@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     query = query.ilike("mold_number", `%${q}%`);
   }
 
-  const { data, error } = await query.limit(all ? 1000 : 30);
+  const { data, error } = await query.limit(all ? 5000 : 30);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
