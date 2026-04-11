@@ -17,7 +17,7 @@ export default async function DDPCalcPage({
   const supabase = await createClient();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: quote } = await (supabase as any)
+  const { data: quote, error: queryError } = await (supabase as any)
     .from("quotations")
     .select(`
       id, status, mold_number, size_dimensions,
@@ -32,6 +32,18 @@ export default async function DDPCalcPage({
     `)
     .eq("id", id)
     .single();
+
+  if (queryError) {
+    return (
+      <div className="p-6 max-w-2xl">
+        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-4">
+          <p className="font-semibold text-red-800 mb-1">Query error</p>
+          <p className="text-sm text-red-700 font-mono">{queryError.message}</p>
+          <p className="text-xs text-red-500 mt-2">Code: {queryError.code}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!quote) notFound();
 
