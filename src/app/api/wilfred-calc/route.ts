@@ -37,10 +37,17 @@ export async function POST(request: NextRequest) {
     approved: false,
   }));
 
+  // Delete existing rows for this sheet then re-insert
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any)
+    .from("wilfred_calculations")
+    .delete()
+    .eq("cost_sheet_id", cost_sheet_id);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from("wilfred_calculations")
-    .upsert(records, { onConflict: "cost_sheet_id,tier_label" })
+    .insert(records)
     .select();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
