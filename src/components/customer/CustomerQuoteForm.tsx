@@ -112,6 +112,26 @@ export default function CustomerQuoteForm({
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onclone: (clonedDoc: any) => {
+          // Remove all stylesheets that use modern CSS color functions (lab, oklch)
+          // that html2canvas cannot parse. The print document uses inline styles only.
+          const sheets: CSSStyleSheet[] = Array.from(clonedDoc.styleSheets);
+          for (const sheet of sheets) {
+            try {
+              const rules: CSSRule[] = Array.from(sheet.cssRules ?? []);
+              const hasLab = rules.some((r) => r.cssText.includes("lab(") || r.cssText.includes("oklch("));
+              if (hasLab && sheet.ownerNode) {
+                (sheet.ownerNode as Element).parentNode?.removeChild(sheet.ownerNode as Element);
+              }
+            } catch {
+              // Cross-origin sheets throw on cssRules access — remove them too
+              if (sheet.ownerNode) {
+                (sheet.ownerNode as Element).parentNode?.removeChild(sheet.ownerNode as Element);
+              }
+            }
+          }
+        },
       });
 
       const imgData = canvas.toDataURL("image/jpeg", 0.98);
