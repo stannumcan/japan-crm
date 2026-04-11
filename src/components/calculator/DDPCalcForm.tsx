@@ -558,7 +558,7 @@ export default function DDPCalcForm({
                         {/* Costs */}
                         <div>
                           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Cost Breakdown</p>
-                          <div className="space-y-1 text-sm">
+                          <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
                             <Row label="Manufacturing" value={formatJPY(result.manufacturingCostJpy)} />
                             <Row label={`Shipping (${SHIPPING_OPTIONS.find((o) => o.value === tier.shippingType)?.label ?? tier.shippingType})`} value={formatJPY(result.shippingCostJpy)} />
                             <Row label={`Import duty (${importDutyRate}%)`} value={formatJPY(result.importDutyJpy)} />
