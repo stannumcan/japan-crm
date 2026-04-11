@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,19 +96,56 @@ export default function CustomerQuoteForm({
     if (!printRef.current) return;
     setPrinting(true);
     try {
-      // Dynamic import — html2pdf.js is browser-only
-      const html2pdf = (await import("html2pdf.js")).default;
-      const filename = `${quoteNumber || "見積書"}.pdf`;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const opts: any = {
-        margin: [8, 8, 8, 8],
-        filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: { mode: ["avoid-all", "css"] },
-      };
-      await html2pdf().set(opts).from(printRef.current).save();
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+
+      const el = printRef.current;
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.98);
+      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 8;
+      const printW = pageW - margin * 2;
+      const printH = (canvas.height * printW) / canvas.width;
+
+      if (printH <= pageH - margin * 2) {
+        // Fits on one page
+        pdf.addImage(imgData, "JPEG", margin, margin, printW, printH);
+      } else {
+        // Multi-page: slice the canvas into A4-height segments
+        const pageHeightPx = (canvas.width * (pageH - margin * 2)) / printW;
+        let yOffset = 0;
+        while (yOffset < canvas.height) {
+          const sliceH = Math.min(pageHeightPx, canvas.height - yOffset);
+          const pageCanvas = document.createElement("canvas");
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = sliceH;
+          const ctx = pageCanvas.getContext("2d")!;
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          ctx.drawImage(canvas, 0, -yOffset);
+          const sliceData = pageCanvas.toDataURL("image/jpeg", 0.98);
+          const slicePrintH = (sliceH * printW) / canvas.width;
+          if (yOffset > 0) pdf.addPage();
+          pdf.addImage(sliceData, "JPEG", margin, margin, printW, slicePrintH);
+          yOffset += pageHeightPx;
+        }
+      }
+
+      pdf.save(`${quoteNumber || "見積書"}.pdf`);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      alert("PDF generation failed. Please try again.");
     } finally {
       setPrinting(false);
     }
@@ -673,12 +709,14 @@ export default function CustomerQuoteForm({
                     <div>Email : info@winhoop.com</div>
                   </div>
                   <div style={{ flexShrink: 0 }}>
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src="/stamp-winhoop.png"
                       alt="WINHOOP stamp"
                       width={72}
                       height={72}
                       style={{ opacity: 0.9 }}
+                      crossOrigin="anonymous"
                     />
                   </div>
                 </div>
