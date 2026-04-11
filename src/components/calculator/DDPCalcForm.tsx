@@ -23,6 +23,11 @@ interface QuoteInfo {
   moldLeadTime: number | null;
 }
 
+interface ContainerSpec {
+  type: string;
+  pcsPerContainer: number | null;
+}
+
 interface PackagingDefaults {
   pcsPerCarton: number | null;
   boxL: number | null;
@@ -32,6 +37,8 @@ interface PackagingDefaults {
   palletW: number | null;
   palletH: number | null;
   boxesPerPallet: number | null;
+  pcsPerPallet: number | null;
+  containers: ContainerSpec[];
 }
 
 interface ApprovedCalc {
@@ -69,6 +76,7 @@ interface PackagingState {
   palletW: string;
   palletH: string;
   boxesPerPallet: string;
+  pcsPerPallet: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -102,6 +110,7 @@ function initPackaging(defaults: PackagingDefaults): PackagingState {
     palletW: defaults.palletW != null ? String(defaults.palletW) : "",
     palletH: defaults.palletH != null ? String(defaults.palletH) : "",
     boxesPerPallet: defaults.boxesPerPallet != null ? String(defaults.boxesPerPallet) : "",
+    pcsPerPallet: defaults.pcsPerPallet != null ? String(defaults.pcsPerPallet) : "",
   };
 }
 
@@ -415,7 +424,27 @@ export default function DDPCalcForm({
                 <Label className="text-xs">Pallet H (mm)</Label>
                 <Input type="number" value={pkg.palletH} onChange={(e) => updatePkg("palletH", e.target.value)} className="h-8" />
               </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Pcs / Pallet</Label>
+                <Input type="number" value={pkg.pcsPerPallet} onChange={(e) => updatePkg("pcsPerPallet", e.target.value)} className="h-8 font-mono" />
+              </div>
             </div>
+            {packagingDefaults.containers.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <p className="text-xs font-medium text-gray-500 mb-2">Container Capacity</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {packagingDefaults.containers.map((c) => (
+                    <div key={c.type} className="rounded-md bg-gray-50 border border-gray-200 px-3 py-2 text-center">
+                      <p className="text-xs font-semibold text-gray-500">{c.type}</p>
+                      <p className="text-sm font-bold text-gray-800 font-mono">
+                        {c.pcsPerContainer != null ? c.pcsPerContainer.toLocaleString() : "—"}
+                      </p>
+                      <p className="text-xs text-gray-400">pcs</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -86,6 +86,7 @@ export default async function DDPCalcPage({
     packagingDefaults: {
       pcsPerCarton: number | null; boxL: number | null; boxW: number | null; boxH: number | null;
       palletL: number | null; palletW: number | null; palletH: number | null; boxesPerPallet: number | null;
+      pcsPerPallet: number | null; containers: { type: string; pcsPerContainer: number | null }[];
     };
     approvedCalcs: { tier_label: string; quantity: number; estimated_cost_rmb: number | null; approved: boolean; quantity_type: string }[];
     existingDDP: Record<string, unknown>[];
@@ -114,6 +115,10 @@ export default async function DDPCalcPage({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pallet = packagingLines.find((l: any) => l.type === "pallet");
 
+    // Extract container capacity rows (20GP, 40GP, 40HQ)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const containerLines = packagingLines.filter((l: any) => ["20GP", "40GP", "40HQ"].includes(l.type));
+
     typedSheets.push({
       id: sheet.id,
       moldNumber: sheet.mold_number ?? null,
@@ -138,6 +143,9 @@ export default async function DDPCalcPage({
         boxesPerPallet: (pallet?.tins && outerCarton?.tins)
           ? Math.round(pallet.tins / outerCarton.tins)
           : null,
+        pcsPerPallet: pallet?.tins ?? null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        containers: containerLines.map((l: any) => ({ type: l.type, pcsPerContainer: l.tins ?? null })),
       },
       approvedCalcs,
       existingDDP: existingDDPAll.filter((r) => r.cost_sheet_id === sheet.id),
