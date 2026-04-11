@@ -5,13 +5,26 @@ import { calculateDDP, type DDPInputs } from "@/lib/calculations";
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const body = await request.json();
-  const { quotation_id, annie_quotation_id, tiers } = body;
+  const { quotation_id, annie_quotation_id, cost_sheet_id, tiers } = body;
+
+  // Delete existing records for this sheet before re-inserting
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const deleteQuery = (supabase as any)
+    .from("natsuki_ddp_calculations")
+    .delete()
+    .eq("quotation_id", quotation_id);
+  if (cost_sheet_id) {
+    await deleteQuery.eq("cost_sheet_id", cost_sheet_id);
+  } else {
+    await deleteQuery.is("cost_sheet_id", null);
+  }
 
   const records = tiers.map((t: DDPInputs & { tier_label: string }) => {
     const result = calculateDDP(t);
     return {
       quotation_id,
       annie_quotation_id,
+      cost_sheet_id: cost_sheet_id ?? null,
       tier_label: t.tier_label,
       quantity: t.customerOrderQty,
       rmb_unit_price: t.rmbUnitPrice,

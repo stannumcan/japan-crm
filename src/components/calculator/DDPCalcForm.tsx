@@ -107,6 +107,7 @@ const ALL_MARGINS = [60, 55, 50, 45, 40, 35, 30, 25];
 export default function DDPCalcForm({
   locale,
   quoteId,
+  costSheetId,
   quoteInfo,
   packagingDefaults,
   approvedCalcs,
@@ -114,13 +115,13 @@ export default function DDPCalcForm({
 }: {
   locale: string;
   quoteId: string;
+  costSheetId: string;
   quoteInfo: QuoteInfo;
   packagingDefaults: PackagingDefaults;
   approvedCalcs: ApprovedCalc[];
   existingDDP: Record<string, unknown>[];
 }) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState(approvedCalcs[0]?.tier_label ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -204,7 +205,7 @@ export default function DDPCalcForm({
       const res = await fetch("/api/ddp-calc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quotation_id: quoteId, tiers: tiersPayload }),
+        body: JSON.stringify({ quotation_id: quoteId, cost_sheet_id: costSheetId, tiers: tiersPayload }),
       });
       if (!res.ok) throw new Error((await res.json()).error ?? "Failed to save");
       router.push(`/${locale}/quotes/${quoteId}`);
@@ -250,7 +251,7 @@ export default function DDPCalcForm({
         <Card>
           <CardHeader className="pb-3"><CardTitle className="text-sm">Shared Settings</CardTitle></CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-400 mb-3">Apply to all tiers</p>
+            <p className="text-xs text-gray-400 mb-3">Applies to all quantities</p>
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">FX Rate (1 RMB = JPY)</Label>
@@ -314,41 +315,20 @@ export default function DDPCalcForm({
         </Card>
       </div>
 
-      {/* ── Per-Tier Tabs ─────────────────────────────────────────── */}
-      <div>
-        {/* Tab buttons */}
-        {tiers.length > 1 && (
-          <div className="flex gap-2 mb-4">
-            {tiers.map((tier) => (
-              <button
-                key={tier.tier_label}
-                type="button"
-                onClick={() => setActiveTab(tier.tier_label)}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium border transition-colors ${
-                  activeTab === tier.tier_label
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                Tier {tier.tier_label}
-              </button>
-            ))}
-          </div>
-        )}
-
+      {/* ── Per-Quantity Pricing Blocks ───────────────────────────── */}
+      <div className="space-y-6">
         {tiers.map((tier) => {
-          if (tier.tier_label !== activeTab) return null;
           const result = calcTier(tier);
           const qty = parseInt(tier.quantity) || 0;
 
           return (
             <div key={tier.tier_label}>
-              <div className="grid grid-cols-5 gap-5 mt-2">
+              <div className="grid grid-cols-5 gap-5">
 
                 {/* Left: inputs (2/5) */}
                 <div className="col-span-2 space-y-4">
                   <Card>
-                    <CardHeader className="pb-3"><CardTitle className="text-sm">Tier {tier.tier_label} — Inputs</CardTitle></CardHeader>
+                    <CardHeader className="pb-3"><CardTitle className="text-sm">Qty {tier.quantity ? parseInt(tier.quantity).toLocaleString() : "—"} pcs — Inputs</CardTitle></CardHeader>
                     <CardContent className="space-y-3">
                       <div className="space-y-1.5">
                         <Label className="text-xs">Customer Order Qty (pcs)</Label>

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import DDPCalcForm from "@/components/calculator/DDPCalcForm";
@@ -51,22 +52,82 @@ export default async function DDPCalcPage({
   const quoteTiers = ((quote.quotation_quantity_tiers ?? []) as { tier_label: string; quantity_type: string; quantity: number | null; sort_order: number }[])
     .sort((a, b) => a.sort_order - b.sort_order);
 
-  // Use first factory cost sheet for packaging specs
-  const sheets = Array.isArray(quote.factory_cost_sheets)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sheets = (Array.isArray(quote.factory_cost_sheets)
     ? quote.factory_cost_sheets
-    : quote.factory_cost_sheets ? [quote.factory_cost_sheets] : [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sheet = (sheets as any[])[0] ?? null;
+    : quote.factory_cost_sheets ? [quote.factory_cost_sheets] : []) as any[];
 
-  // Flatten approved wilfred calcs across all sheets
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const allWilfredCalcs = (sheets as any[]).flatMap((s) =>
-    Array.isArray(s.wilfred_calculations) ? s.wilfred_calculations : []
-  ) as { tier_label: string; quantity: number; estimated_cost_rmb: number | null; approved: boolean }[];
+  const existingDDPAll = (quote.natsuki_ddp_calculations as Record<string, unknown>[]) ?? [];
 
-  const approvedCalcs = allWilfredCalcs.filter((c) => c.approved);
+  type SheetForDDP = {
+    id: string;
+    moldNumber: string | null;
+    quoteInfo: {
+      companyName: string; projectName: string; woNumber: string; canSize: string;
+      moldNumber: string; moldCostNew: number | null; moldCostModify: number | null; moldLeadTime: number | null;
+    };
+    packagingDefaults: {
+      pcsPerCarton: number | null; boxL: number | null; boxW: number | null; boxH: number | null;
+      palletL: number | null; palletW: number | null; palletH: number | null; boxesPerPallet: number | null;
+    };
+    approvedCalcs: { tier_label: string; quantity: number; estimated_cost_rmb: number | null; approved: boolean; quantity_type: string }[];
+    existingDDP: Record<string, unknown>[];
+  };
 
-  if (!sheet || approvedCalcs.length === 0) {
+  // Build per-sheet data — only include sheets with at least one approved wilfred calc
+  const typedSheets: SheetForDDP[] = [];
+  for (const sheet of sheets) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const wilfredCalcs: { tier_label: string; quantity: number; estimated_cost_rmb: number | null; approved: boolean }[] =
+      Array.isArray(sheet.wilfred_calculations) ? sheet.wilfred_calculations : [];
+
+    const approvedCalcs = wilfredCalcs
+      .filter((c) => c.approved)
+      .map((calc) => {
+        const quoteTier = quoteTiers.find((t) => t.tier_label === calc.tier_label);
+        return { ...calc, quantity_type: quoteTier?.quantity_type ?? "units" };
+      });
+
+    if (approvedCalcs.length === 0) continue;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const packagingLines: any[] = Array.isArray(sheet.packaging_lines) ? sheet.packaging_lines : [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const outerCarton = packagingLines.find((l: any) => l.type === "outer_carton");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pallet = packagingLines.find((l: any) => l.type === "pallet");
+
+    typedSheets.push({
+      id: sheet.id,
+      moldNumber: sheet.mold_number ?? null,
+      quoteInfo: {
+        companyName: wo?.company_name ?? "",
+        projectName: wo?.project_name ?? "",
+        woNumber: wo?.wo_number ?? "",
+        canSize: quote.size_dimensions ?? "",
+        moldNumber: sheet.mold_number ?? quote.mold_number ?? "",
+        moldCostNew: sheet.mold_cost_new ?? null,
+        moldCostModify: sheet.mold_cost_modify ?? null,
+        moldLeadTime: sheet.mold_lead_time_days ?? null,
+      },
+      packagingDefaults: {
+        pcsPerCarton: outerCarton?.tins ?? null,
+        boxL: outerCarton?.l ?? null,
+        boxW: outerCarton?.w ?? null,
+        boxH: outerCarton?.h ?? null,
+        palletL: pallet?.l ?? null,
+        palletW: pallet?.w ?? null,
+        palletH: pallet?.h ?? null,
+        boxesPerPallet: (pallet?.tins && outerCarton?.tins)
+          ? Math.round(pallet.tins / outerCarton.tins)
+          : null,
+      },
+      approvedCalcs,
+      existingDDP: existingDDPAll.filter((r) => r.cost_sheet_id === sheet.id),
+    });
+  }
+
+  if (typedSheets.length === 0) {
     return (
       <div className="p-6 max-w-3xl">
         <div className="flex items-center gap-3 mb-6">
@@ -88,49 +149,6 @@ export default async function DDPCalcPage({
     );
   }
 
-  // Extract packaging specs from packaging_lines JSONB
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const packagingLines: any[] = Array.isArray(sheet.packaging_lines) ? sheet.packaging_lines : [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const outerCarton = packagingLines.find((l: any) => l.type === "outer_carton");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pallet = packagingLines.find((l: any) => l.type === "pallet");
-
-  const packagingDefaults = {
-    pcsPerCarton: outerCarton?.tins ?? null,
-    boxL: outerCarton?.l ?? null,
-    boxW: outerCarton?.w ?? null,
-    boxH: outerCarton?.h ?? null,
-    palletL: pallet?.l ?? null,
-    palletW: pallet?.w ?? null,
-    palletH: pallet?.h ?? null,
-    boxesPerPallet: (pallet?.tins && outerCarton?.tins)
-      ? Math.round(pallet.tins / outerCarton.tins)
-      : null,
-  };
-
-  const quoteInfo = {
-    companyName: wo?.company_name ?? "",
-    projectName: wo?.project_name ?? "",
-    woNumber: wo?.wo_number ?? "",
-    canSize: quote.size_dimensions ?? "",
-    moldNumber: sheet.mold_number ?? quote.mold_number ?? "",
-    moldCostNew: sheet.mold_cost_new ?? null,
-    moldCostModify: sheet.mold_cost_modify ?? null,
-    moldLeadTime: sheet.mold_lead_time_days ?? null,
-  };
-
-  // Merge approved calcs with quantity_type from quote tiers
-  const tiersForForm = approvedCalcs.map((calc) => {
-    const quoteTier = quoteTiers.find((t) => t.tier_label === calc.tier_label);
-    return {
-      ...calc,
-      quantity_type: quoteTier?.quantity_type ?? "units",
-    };
-  });
-
-  const existingDDP = (quote.natsuki_ddp_calculations as Record<string, unknown>[]) ?? [];
-
   return (
     <div className="p-6 max-w-5xl">
       <div className="flex items-center gap-3 mb-6">
@@ -148,14 +166,40 @@ export default async function DDPCalcPage({
         </div>
       </div>
 
-      <DDPCalcForm
-        locale={locale}
-        quoteId={id}
-        quoteInfo={quoteInfo}
-        packagingDefaults={packagingDefaults}
-        approvedCalcs={tiersForForm}
-        existingDDP={existingDDP}
-      />
+      {typedSheets.length === 1 ? (
+        <DDPCalcForm
+          locale={locale}
+          quoteId={id}
+          costSheetId={typedSheets[0].id}
+          quoteInfo={typedSheets[0].quoteInfo}
+          packagingDefaults={typedSheets[0].packagingDefaults}
+          approvedCalcs={typedSheets[0].approvedCalcs}
+          existingDDP={typedSheets[0].existingDDP}
+        />
+      ) : (
+        <Tabs defaultValue={typedSheets[0].id}>
+          <TabsList className="mb-4">
+            {typedSheets.map((sheet, i) => (
+              <TabsTrigger key={sheet.id} value={sheet.id}>
+                {sheet.moldNumber ?? `Mold ${i + 1}`}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {typedSheets.map((sheet) => (
+            <TabsContent key={sheet.id} value={sheet.id}>
+              <DDPCalcForm
+                locale={locale}
+                quoteId={id}
+                costSheetId={sheet.id}
+                quoteInfo={sheet.quoteInfo}
+                packagingDefaults={sheet.packagingDefaults}
+                approvedCalcs={sheet.approvedCalcs}
+                existingDDP={sheet.existingDDP}
+              />
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
     </div>
   );
 }
