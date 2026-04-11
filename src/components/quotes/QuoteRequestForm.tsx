@@ -9,9 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, AlertCircle } from "lucide-react";
+import { Plus, Trash2, AlertCircle, Paperclip } from "lucide-react";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { Modal } from "@/components/ui/modal";
+import { FileUpload, type UploadedFile } from "@/components/ui/file-upload";
 
 interface MoldEntry {
   id: string;
@@ -226,6 +227,8 @@ export default function QuoteRequestForm({
   ]);
 
   const [internalNotes, setInternalNotes] = useState("");
+  const [attachments, setAttachments] = useState<UploadedFile[]>([]);
+  const [sessionId] = useState(() => crypto.randomUUID());
 
   // ── Company fetch ─────────────────────────────────────────────────
   const fetchCompanies = async (q: string) => {
@@ -363,6 +366,7 @@ export default function QuoteRequestForm({
       printing_notes: printingNotes || null,
       embossment_notes: embossmentNotes || null,
       internal_notes: internalNotes || null,
+      attachments: attachments.length ? attachments : null,
       status: "pending_factory",
       quantity_tiers: tiers.map((t, i) => ({
         tier_label: t.tier_label,
@@ -643,6 +647,19 @@ export default function QuoteRequestForm({
                 ))}
               </tbody>
             </table>
+          </CardContent>
+        </Card>
+
+        {/* Attachments */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Paperclip className="h-4 w-4 text-gray-400" />
+              Attachments
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FileUpload sessionId={sessionId} onChange={setAttachments} />
           </CardContent>
         </Card>
 

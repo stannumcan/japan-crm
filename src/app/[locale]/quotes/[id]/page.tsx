@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, CheckCircle2, Circle, Clock, ChevronRight, AlertCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, Clock, ChevronRight, AlertCircle, Paperclip } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
@@ -281,6 +281,35 @@ export default async function QuoteDetailPage({
               <CardHeader className="pb-2"><CardTitle className="text-sm text-amber-700">Internal Notes</CardTitle></CardHeader>
               <CardContent>
                 <p className="text-xs text-gray-600 whitespace-pre-wrap">{quote.internal_notes}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Attachments */}
+          {Array.isArray(quote.attachments) && quote.attachments.length > 0 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-1.5">
+                  <Paperclip className="h-3.5 w-3.5 text-gray-400" />
+                  Attachments
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-1.5">
+                  {(quote.attachments as { name: string; url: string; size: number; type: string }[]).map((f, i) => (
+                    <li key={i}>
+                      <a
+                        href={f.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-xs text-blue-700 hover:underline truncate"
+                      >
+                        <Paperclip className="h-3 w-3 flex-shrink-0 text-gray-400" />
+                        <span className="truncate">{f.name}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
           )}
