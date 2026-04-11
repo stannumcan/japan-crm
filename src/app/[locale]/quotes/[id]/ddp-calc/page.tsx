@@ -24,13 +24,14 @@ export default async function DDPCalcPage({
       work_orders(wo_number, company_name, project_name),
       quotation_quantity_tiers(tier_label, quantity_type, quantity, sort_order),
       factory_cost_sheets(
+        id,
         outer_carton_qty,
         outer_carton_l, outer_carton_w, outer_carton_h, outer_carton_cbm,
         pallet_l, pallet_w, pallet_h,
         cans_per_pallet,
-        factory_cost_tiers(tier_label, quantity, total_subtotal)
+        factory_cost_tiers(tier_label, quantity, total_subtotal),
+        wilfred_calculations(tier_label, quantity, estimated_cost_rmb, approved)
       ),
-      wilfred_calculations(tier_label, quantity, estimated_cost_rmb, approved),
       natsuki_ddp_calculations(*)
     `)
     .eq("id", id)
@@ -42,12 +43,16 @@ export default async function DDPCalcPage({
   const sheets = Array.isArray(quote.factory_cost_sheets) ? quote.factory_cost_sheets : [quote.factory_cost_sheets].filter(Boolean);
   const sheet = (sheets as Record<string, unknown>[] | null)?.[0] ?? null;
 
-  const wilfredCalcs = (quote.wilfred_calculations as {
+  // Flatten wilfred_calculations from all sheets
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const wilfredCalcs = (sheets as any[]).flatMap((s) =>
+    Array.isArray(s.wilfred_calculations) ? s.wilfred_calculations : []
+  ) as {
     tier_label: string;
     quantity: number;
     estimated_cost_rmb: number | null;
     approved: boolean;
-  }[]) ?? [];
+  }[];
 
   const approvedCalcs = wilfredCalcs.filter((c) => c.approved);
 
