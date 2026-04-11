@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { FileText, ClipboardList, Building2, Settings, Package } from "lucide-react";
+import { FileText, ClipboardList, Building2, Settings, Package, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 const LOCALES = [
   { code: "en", label: "EN" },
@@ -15,6 +16,14 @@ const LOCALES = [
 export default function Sidebar({ locale }: { locale: string }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   const navItems = [
     { href: `/${locale}/workorders`, label: t("workorders"), icon: ClipboardList },
@@ -113,6 +122,26 @@ export default function Sidebar({ locale }: { locale: string }) {
           );
         })}
       </nav>
+
+      {/* Logout */}
+      <div className="px-3 pb-2">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150"
+          style={{ color: "oklch(0.45 0.01 52)" }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.background = "var(--sidebar-accent)";
+            (e.currentTarget as HTMLElement).style.color = "var(--sidebar-foreground)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.background = "transparent";
+            (e.currentTarget as HTMLElement).style.color = "oklch(0.45 0.01 52)";
+          }}
+        >
+          <LogOut className="h-3.5 w-3.5 shrink-0" />
+          <span style={{ fontSize: "13px", letterSpacing: "0.01em" }}>Sign out</span>
+        </button>
+      </div>
 
       {/* Language switcher */}
       <div
