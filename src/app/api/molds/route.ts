@@ -6,6 +6,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q")?.trim();
   const all = searchParams.get("all") === "true";
+  const from = parseInt(searchParams.get("from") ?? "0", 10);
+  const pageSize = all ? 1000 : 30;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query = (supabase as any)
@@ -19,7 +21,9 @@ export async function GET(request: NextRequest) {
     query = query.ilike("mold_number", `%${q}%`);
   }
 
-  const { data, error } = await query.limit(all ? 5000 : 30);
+  query = query.range(from, from + pageSize - 1);
+
+  const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }

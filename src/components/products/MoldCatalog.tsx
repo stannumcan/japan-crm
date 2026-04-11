@@ -239,8 +239,16 @@ export default function MoldCatalog() {
   const fetchMolds = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/molds?all=true");
-      setMolds(await res.json());
+      const all: Mold[] = [];
+      let from = 0;
+      while (true) {
+        const res = await fetch(`/api/molds?all=true&from=${from}`);
+        const page: Mold[] = await res.json();
+        all.push(...page);
+        if (page.length < 1000) break;
+        from += 1000;
+      }
+      setMolds(all);
     } finally {
       setLoading(false);
     }
