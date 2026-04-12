@@ -4,15 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-
-// ── Tab definitions ──────────────────────────────────────────────────────────
-const TABS = [
-  { key: "requests",       label: "Quote Requests" },
-  { key: "factory-sheet",  label: "Factory Cost Sheet" },
-  { key: "wilfred-calc",   label: "Wilfred Cost Calc" },
-  { key: "ddp-calc",       label: "DDP Calculation" },
-  { key: "customer-quote", label: "Customer Quote" },
-];
+import QuoteTabNav from "@/components/quotes/QuoteTabNav";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   draft: "secondary",
@@ -114,27 +106,7 @@ export default async function QuotesPage({
       </div>
 
       {/* Tab Nav */}
-      <div className="border-b border-border mb-0">
-        <nav className="flex gap-0 -mb-px overflow-x-auto">
-          {TABS.map((tab, i) => {
-            const isActive = tab.key === activeTab;
-            return (
-              <Link
-                key={tab.key}
-                href={`/${locale}/quotes?tab=${tab.key}`}
-                className={`flex items-center gap-1.5 px-4 py-3 text-xs font-medium whitespace-nowrap border-b-2 transition-colors
-                  ${isActive
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                  }`}
-              >
-                <span className="font-mono text-[10px] opacity-50">{String(i + 1).padStart(2, "0")}</span>
-                {tab.label}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
+      <QuoteTabNav locale={locale} activeTab={activeTab} />
 
       {/* Table */}
       <div className="border border-t-0 rounded-b-lg overflow-hidden bg-card">

@@ -2,34 +2,35 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { usePermissions } from "@/lib/permissions-context";
+import type { PageKey } from "@/lib/permissions";
 
-const TABS = [
-  { label: "Overview", suffix: "" },
-  { label: "Quote Request", suffix: "/request" },
-  { label: "Factory Sheet", suffix: "/factory-sheet" },
-  { label: "Wilfred Calc", suffix: "/cost-calc" },
-  { label: "DDP Calc", suffix: "/ddp-calc" },
-  { label: "Customer Quote", suffix: "/customer-quote" },
+const ALL_TABS: { label: string; suffix: string; pageKey: PageKey | null }[] = [
+  { label: "Overview",        suffix: "",                pageKey: "quotes_requests" },
+  { label: "Quote Request",   suffix: "/request",        pageKey: "quotes_requests" },
+  { label: "Factory Sheet",   suffix: "/factory-sheet",  pageKey: "quotes_factory_sheet" },
+  { label: "Wilfred Calc",    suffix: "/cost-calc",      pageKey: "quotes_wilfred_calc" },
+  { label: "DDP Calc",        suffix: "/ddp-calc",       pageKey: "quotes_ddp_calc" },
+  { label: "Customer Quote",  suffix: "/customer-quote", pageKey: "quotes_customer_quote" },
 ];
 
 export default function QuoteSubNav({ basePath }: { basePath: string }) {
   const pathname = usePathname();
+  const { canView } = usePermissions();
 
-  // Determine active tab by matching the current path suffix
+  const tabs = ALL_TABS.filter((t) => t.pageKey === null || canView(t.pageKey));
+
   const activeTab = (() => {
-    // Check from most specific to least
-    for (const tab of [...TABS].reverse()) {
+    for (const tab of [...tabs].reverse()) {
       if (tab.suffix && pathname.startsWith(basePath + tab.suffix)) return tab.suffix;
     }
-    // Overview: exactly the basePath or basePath/
-    if (pathname === basePath || pathname === basePath + "/") return "";
     return "";
   })();
 
   return (
     <div className="border-b border-border bg-card px-6">
       <nav className="flex gap-0 -mb-px overflow-x-auto">
-        {TABS.map((tab, i) => {
+        {tabs.map((tab, i) => {
           const isActive = tab.suffix === activeTab;
           return (
             <Link
