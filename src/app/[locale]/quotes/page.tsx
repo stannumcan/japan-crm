@@ -67,7 +67,7 @@ export default async function QuotesPage({
   } else if (activeTab === "wilfred-calc") {
     const { data } = await db
       .from("wilfred_calculations")
-      .select("id, tier_label, estimated_cost_rmb, margin_rate, approved, created_at, cost_sheet_id, factory_cost_sheets(id, mold_number, quotation_id, quotations(id, work_orders(wo_number, company_name, project_name)))")
+      .select("id, quantity, estimated_cost_rmb, margin_rate, approved, created_at, cost_sheet_id, factory_cost_sheets(id, mold_number, quotation_id, quotations(id, work_orders(wo_number, company_name, project_name)))")
       .order("created_at", { ascending: false })
       .limit(500);
     rows = data ?? [];
@@ -205,7 +205,7 @@ export default async function QuotesPage({
                 <Th>WO #</Th>
                 <Th>Company</Th>
                 <Th>Mold #</Th>
-                <Th>Tier</Th>
+                <Th>Qty</Th>
                 <Th>Est. Cost (RMB)</Th>
                 <Th>Margin</Th>
                 <Th>Approved</Th>
@@ -225,11 +225,7 @@ export default async function QuotesPage({
                     <Td><span className="font-mono font-semibold text-blue-700">{wo?.wo_number ?? "—"}</span></Td>
                     <Td className="font-medium">{wo?.company_name ?? "—"}</Td>
                     <Td className="font-mono text-xs">{fs?.mold_number ?? "—"}</Td>
-                    <Td>
-                      <span className="inline-flex items-center justify-center h-5 w-5 rounded bg-muted text-xs font-bold font-mono">
-                        {wc.tier_label ?? "—"}
-                      </span>
-                    </Td>
+                    <Td className="text-muted-foreground">{wc.quantity ? wc.quantity.toLocaleString() : "—"}</Td>
                     <Td className="text-muted-foreground">{wc.estimated_cost_rmb ? `¥${Number(wc.estimated_cost_rmb).toFixed(4)}` : "—"}</Td>
                     <Td className="text-muted-foreground">{wc.margin_rate ? `${(Number(wc.margin_rate) * 100).toFixed(0)}%` : "—"}</Td>
                     <Td>
@@ -261,7 +257,6 @@ export default async function QuotesPage({
               <tr className="bg-muted/50 border-b border-border">
                 <Th>WO #</Th>
                 <Th>Company</Th>
-                <Th>Tier</Th>
                 <Th>Qty</Th>
                 <Th>Unit Price (JPY)</Th>
                 <Th>Total Revenue (JPY)</Th>
@@ -270,7 +265,7 @@ export default async function QuotesPage({
             </thead>
             <tbody className="divide-y divide-border/60">
               {rows.length === 0 && (
-                <tr><td colSpan={7} className="text-center text-muted-foreground py-10">No DDP calculations yet</td></tr>
+                <tr><td colSpan={6} className="text-center text-muted-foreground py-10">No DDP calculations yet</td></tr>
               )}
               {rows.map((ddp) => {
                 const wo = ddp.quotations?.work_orders;
@@ -279,11 +274,6 @@ export default async function QuotesPage({
                   <tr key={ddp.id} className="hover:bg-muted/30 transition-colors">
                     <Td><span className="font-mono font-semibold text-blue-700">{wo?.wo_number ?? "—"}</span></Td>
                     <Td className="font-medium">{wo?.company_name ?? "—"}</Td>
-                    <Td>
-                      <span className="inline-flex items-center justify-center h-5 w-5 rounded bg-muted text-xs font-bold font-mono">
-                        {ddp.tier_label ?? "—"}
-                      </span>
-                    </Td>
                     <Td className="text-muted-foreground">{ddp.quantity ? ddp.quantity.toLocaleString() : "—"}</Td>
                     <Td className="font-medium">
                       {ddp.unit_price_jpy ? `¥${Number(ddp.unit_price_jpy).toLocaleString()}` : "—"}

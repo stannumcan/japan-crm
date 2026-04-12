@@ -188,12 +188,8 @@ export default function WilfredCalcForm({
           <Card key={row.tier_label} className={isApproved ? "border-green-300" : ""}>
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center h-8 w-8 rounded bg-gray-100 text-sm font-bold text-gray-700">
-                  {row.tier_label}
-                </div>
                 <div>
-                  <CardTitle className="text-base">Tier {row.tier_label}</CardTitle>
-                  <p className="text-xs text-gray-500">{row.quantity.toLocaleString()} pcs</p>
+                  <CardTitle className="text-base">{row.quantity.toLocaleString()} pcs</CardTitle>
                 </div>
               </div>
               {isApproved ? (
