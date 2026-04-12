@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     .update({ status: "pending_wilfred" })
     .eq("id", sheetData.quotation_id);
 
-  notifyWorkflowStep(sheetData.quotation_id, "pending_wilfred");
+  await notifyWorkflowStep(sheetData.quotation_id, "pending_wilfred");
 
   return NextResponse.json(sheet, { status: 201 });
 }

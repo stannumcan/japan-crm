@@ -110,7 +110,7 @@ export async function PATCH(request: NextRequest) {
           .update({ status: "pending_natsuki" })
           .eq("id", sheet.quotation_id);
 
-        notifyWorkflowStep(sheet.quotation_id, "pending_natsuki");
+        await notifyWorkflowStep(sheet.quotation_id, "pending_natsuki");
       }
     }
   }

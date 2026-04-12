@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     .update({ status: "sent" })
     .eq("id", body.quotation_id);
 
-  notifyWorkflowStep(body.quotation_id, "sent");
+  await notifyWorkflowStep(body.quotation_id, "sent");
 
   return NextResponse.json(data, { status: 201 });
 }

@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Notify workflow — new quote starts at pending_factory
-  notifyWorkflowStep(quotation.id, "pending_factory");
+  await notifyWorkflowStep(quotation.id, "pending_factory");
 
   return NextResponse.json(quotation, { status: 201 });
 }
