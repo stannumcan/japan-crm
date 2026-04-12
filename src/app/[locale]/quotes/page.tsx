@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import QuoteTabNav from "@/components/quotes/QuoteTabNav";
+import DeleteButton from "@/components/quotes/DeleteButton";
 
 const STATUS_STEPS = [
   { key: "draft",           label: "Draft" },
@@ -171,11 +172,14 @@ export default async function QuotesPage({
                     <Td><QuoteProgress status={q.status} /></Td>
                     <Td className="text-muted-foreground">{q.created_at ? new Date(q.created_at).toLocaleDateString() : "—"}</Td>
                     <Td>
-                      <Link href={`/${locale}/quotes/${q.id}/request`}>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </Link>
+                      <div className="flex items-center gap-0.5 justify-end">
+                        <Link href={`/${locale}/quotes/${q.id}/request`}>
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <DeleteButton endpoint={`/api/quotes/${q.id}`} label={`quote ${wo?.wo_number ?? q.id}`} />
+                      </div>
                     </Td>
                   </tr>
                 );
@@ -212,11 +216,14 @@ export default async function QuotesPage({
                     <Td className="text-muted-foreground">{fs.steel_thickness ?? "—"}</Td>
                     <Td className="text-muted-foreground">{fs.sheet_date ? new Date(fs.sheet_date).toLocaleDateString() : "—"}</Td>
                     <Td>
-                      <Link href={`/${locale}/quotes/${quotationId}/factory-sheet/${fs.id}`}>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </Link>
+                      <div className="flex items-center gap-0.5 justify-end">
+                        <Link href={`/${locale}/quotes/${quotationId}/factory-sheet/${fs.id}`}>
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <DeleteButton endpoint={`/api/factory-sheets?id=${fs.id}`} label={`factory sheet ${fs.mold_number ?? ""}`} />
+                      </div>
                     </Td>
                   </tr>
                 );
@@ -263,13 +270,16 @@ export default async function QuotesPage({
                       }
                     </Td>
                     <Td>
-                      {quotationId && (
-                        <Link href={`/${locale}/quotes/${quotationId}/cost-calc`}>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                      )}
+                      <div className="flex items-center gap-0.5 justify-end">
+                        {quotationId && (
+                          <Link href={`/${locale}/quotes/${quotationId}/cost-calc`}>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        )}
+                        <DeleteButton endpoint={`/api/wilfred-calc?id=${wc.id}`} label="this calculation" />
+                      </div>
                     </Td>
                   </tr>
                 );
@@ -310,13 +320,16 @@ export default async function QuotesPage({
                       {ddp.total_revenue_jpy ? `¥${Number(ddp.total_revenue_jpy).toLocaleString()}` : "—"}
                     </Td>
                     <Td>
-                      {quotationId && (
-                        <Link href={`/${locale}/quotes/${quotationId}/ddp-calc`}>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                      )}
+                      <div className="flex items-center gap-0.5 justify-end">
+                        {quotationId && (
+                          <Link href={`/${locale}/quotes/${quotationId}/ddp-calc`}>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        )}
+                        <DeleteButton endpoint={`/api/ddp-calc?id=${ddp.id}`} label="this DDP calculation" />
+                      </div>
                     </Td>
                   </tr>
                 );
@@ -355,13 +368,16 @@ export default async function QuotesPage({
                       {cq.date_sent ? new Date(cq.date_sent).toLocaleDateString() : "—"}
                     </Td>
                     <Td>
-                      {quotationId && (
-                        <Link href={`/${locale}/quotes/${quotationId}/customer-quote`}>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                      )}
+                      <div className="flex items-center gap-0.5 justify-end">
+                        {quotationId && (
+                          <Link href={`/${locale}/quotes/${quotationId}/customer-quote`}>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        )}
+                        <DeleteButton endpoint={`/api/customer-quotes?id=${cq.id}`} label={`customer quote ${cq.winhoop_quote_number ?? ""}`} />
+                      </div>
                     </Td>
                   </tr>
                 );
