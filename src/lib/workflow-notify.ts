@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getResend, EMAIL_FROM } from "@/lib/email";
+import { getResend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/email";
 import { buildQuoteEmail } from "@/lib/email-template";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://japan-crm.vercel.app";
@@ -55,6 +55,7 @@ export async function notifyWorkflowStep(quotationId: string, newStatus: string)
     for (const email of step.assignee_emails) {
       await resend.emails.send({
         from: EMAIL_FROM,
+        replyTo: EMAIL_REPLY_TO,
         to: email,
         subject,
         html,

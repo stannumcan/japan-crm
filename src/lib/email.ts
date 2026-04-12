@@ -11,5 +11,6 @@ export function getResend(): Resend {
   return _resend;
 }
 
-// Sender address — must match your verified Resend domain
-export const EMAIL_FROM = process.env.RESEND_FROM_EMAIL ?? "CRM <noreply@stannumcan.com>";
+// Sender address — using Resend test domain until custom domain is verified
+export const EMAIL_FROM = process.env.RESEND_FROM_EMAIL ?? "Winhoop CRM <onboarding@resend.dev>";
+export const EMAIL_REPLY_TO = "wilfred@stannumcan.com";
