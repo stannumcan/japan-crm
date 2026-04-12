@@ -53,13 +53,20 @@ export async function notifyWorkflowStep(quotationId: string, newStatus: string)
     const resend = getResend();
 
     for (const email of step.assignee_emails) {
-      await resend.emails.send({
+      const { data: sendResult, error: sendError } = await resend.emails.send({
         from: EMAIL_FROM,
         replyTo: EMAIL_REPLY_TO,
         to: email,
         subject,
         html,
       });
+
+      if (sendError) {
+        console.error(`[workflow-notify] Resend error for ${email}:`, JSON.stringify(sendError));
+        continue;
+      }
+
+      console.log(`[workflow-notify] Email sent to ${email}, id: ${sendResult?.id}`);
 
       await supabase.from("workflow_email_log").insert({
         quotation_id: quotationId,
