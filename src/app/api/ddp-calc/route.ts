@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { calculateDDP, type DDPInputs } from "@/lib/calculations";
+import { notifyWorkflowStep } from "@/lib/workflow-notify";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -59,6 +60,8 @@ export async function POST(request: NextRequest) {
     .from("quotations")
     .update({ status: "sent" })
     .eq("id", quotation_id);
+
+  notifyWorkflowStep(quotation_id, "sent");
 
   return NextResponse.json(data, { status: 201 });
 }

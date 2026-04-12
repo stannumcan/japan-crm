@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { notifyWorkflowStep } from "@/lib/workflow-notify";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -29,6 +30,8 @@ export async function POST(request: NextRequest) {
     .from("quotations")
     .update({ status: "pending_wilfred" })
     .eq("id", sheetData.quotation_id);
+
+  notifyWorkflowStep(sheetData.quotation_id, "pending_wilfred");
 
   return NextResponse.json(sheet, { status: 201 });
 }

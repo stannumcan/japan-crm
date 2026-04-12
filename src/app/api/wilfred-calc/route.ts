@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { calculateWilfredCost } from "@/lib/calculations";
+import { notifyWorkflowStep } from "@/lib/workflow-notify";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -108,6 +109,8 @@ export async function PATCH(request: NextRequest) {
           .from("quotations")
           .update({ status: "pending_natsuki" })
           .eq("id", sheet.quotation_id);
+
+        notifyWorkflowStep(sheet.quotation_id, "pending_natsuki");
       }
     }
   }

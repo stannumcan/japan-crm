@@ -3,6 +3,7 @@ import Link from "next/link";
 const TABS = [
   { key: "users",    label: "Users",               suffix: "/users" },
   { key: "profiles", label: "Permission Profiles",  suffix: "/profiles" },
+  { key: "workflow", label: "Workflow",             suffix: "/workflow" },
 ];
 
 export default async function SettingsLayout({
