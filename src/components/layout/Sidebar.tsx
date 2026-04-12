@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { FileText, ClipboardList, Building2, Settings, Package, LogOut } from "lucide-react";
+import { FileText, ClipboardList, Building2, Settings, Package, LogOut, FlaskConical, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { usePermissions } from "@/lib/permissions-context";
+import type { PageKey } from "@/lib/permissions";
 
 const LOCALES = [
   { code: "en", label: "EN" },
@@ -17,26 +19,30 @@ export default function Sidebar({ locale }: { locale: string }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
+  const { canView, isAdmin, testProfileId, testProfileName, setTestProfile, allProfiles } = usePermissions();
+
+  const allNavItems: { href: string; label: string; icon: React.ElementType; pageKey: PageKey }[] = [
+    { href: `/${locale}/workorders`, label: t("workorders"), icon: ClipboardList, pageKey: "workorders" },
+    { href: `/${locale}/quotes`,     label: t("quotes"),     icon: FileText,      pageKey: "quotes_requests" },
+    { href: `/${locale}/companies`,  label: t("companies"),  icon: Building2,     pageKey: "customers" },
+    { href: `/${locale}/products`,   label: t("products"),   icon: Package,       pageKey: "products" },
+    { href: `/${locale}/settings`,   label: t("settings"),   icon: Settings,      pageKey: "settings" },
+  ];
+
+  // Filter nav items based on permissions
+  const navItems = allNavItems.filter((item) => canView(item.pageKey));
+
+  const switchLocale = (newLocale: string) => {
+    const segments = pathname.split("/");
+    segments[1] = newLocale;
+    return segments.join("/");
+  };
 
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
-  };
-
-  const navItems = [
-    { href: `/${locale}/workorders`, label: t("workorders"), icon: ClipboardList },
-    { href: `/${locale}/quotes`,     label: t("quotes"),     icon: FileText },
-    { href: `/${locale}/companies`,  label: t("companies"),  icon: Building2 },
-    { href: `/${locale}/products`,   label: t("products"),   icon: Package },
-    { href: `/${locale}/settings`,   label: t("settings"),   icon: Settings },
-  ];
-
-  const switchLocale = (newLocale: string) => {
-    const segments = pathname.split("/");
-    segments[1] = newLocale;
-    return segments.join("/");
   };
 
   return (
@@ -53,7 +59,6 @@ export default function Sidebar({ locale }: { locale: string }) {
         style={{ borderBottom: "1px solid var(--sidebar-border)" }}
       >
         <div className="flex items-center gap-2.5 mb-0.5">
-          {/* Vermillion seal motif */}
           <div
             className="w-5 h-5 rounded-sm shrink-0 flex items-center justify-center"
             style={{ background: "var(--primary)" }}
@@ -80,6 +85,26 @@ export default function Sidebar({ locale }: { locale: string }) {
         </p>
       </div>
 
+      {/* Test profile banner */}
+      {isAdmin && testProfileId && (
+        <div
+          className="flex items-center justify-between px-3 py-1.5 text-xs"
+          style={{ background: "oklch(0.97 0.08 85)", borderBottom: "1px solid oklch(0.88 0.10 85)" }}
+        >
+          <span style={{ color: "oklch(0.45 0.12 85)" }}>
+            <FlaskConical className="inline h-3 w-3 mr-1 -mt-0.5" />
+            {testProfileName}
+          </span>
+          <button
+            onClick={() => setTestProfile(null)}
+            style={{ color: "oklch(0.50 0.12 85)" }}
+            title="Exit test mode"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </div>
+      )}
+
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {navItems.map(({ href, label, icon: Icon }, idx) => {
@@ -102,7 +127,6 @@ export default function Sidebar({ locale }: { locale: string }) {
                 if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
               }}
             >
-              {/* Sequential index */}
               <span
                 className="tabular-nums shrink-0 w-4 text-right"
                 style={{
@@ -122,6 +146,36 @@ export default function Sidebar({ locale }: { locale: string }) {
           );
         })}
       </nav>
+
+      {/* Profile switcher (admin only) */}
+      {isAdmin && (
+        <div
+          className="px-3 pb-3"
+          style={{ borderTop: "1px solid var(--sidebar-border)", paddingTop: "10px" }}
+        >
+          <p
+            className="mb-1.5 uppercase"
+            style={{ color: "oklch(0.40 0.01 52)", fontSize: "9px", letterSpacing: "0.14em" }}
+          >
+            Test Profile
+          </p>
+          <select
+            value={testProfileId ?? ""}
+            onChange={(e) => setTestProfile(e.target.value || null)}
+            className="w-full rounded text-xs px-2 py-1.5 border outline-none"
+            style={{
+              background: "var(--sidebar-accent)",
+              borderColor: "var(--sidebar-border)",
+              color: "var(--sidebar-foreground)",
+            }}
+          >
+            <option value="">— My real permissions —</option>
+            {allProfiles.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Logout */}
       <div className="px-3 pb-2">

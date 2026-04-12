@@ -3,6 +3,7 @@ import { getMessages, getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Sidebar from "@/components/layout/Sidebar";
+import { PermissionsProvider } from "@/lib/permissions-context";
 
 type Locale = "en" | "ja" | "zh";
 
@@ -23,12 +24,14 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <div className="flex h-screen bg-background">
-        <Sidebar locale={locale} />
-        <main className="flex-1 overflow-auto page-enter">
-          {children}
-        </main>
-      </div>
+      <PermissionsProvider>
+        <div className="flex h-screen bg-background">
+          <Sidebar locale={locale} />
+          <main className="flex-1 overflow-auto page-enter">
+            {children}
+          </main>
+        </div>
+      </PermissionsProvider>
     </NextIntlClientProvider>
   );
 }
